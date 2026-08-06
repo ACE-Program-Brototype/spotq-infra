@@ -13,6 +13,7 @@ spotq-infra/
 ├── terraform/        # Infrastructure as Code (IaC) for cloud provisioning
 ├── monitoring/       # Monitoring, alerting, and observability configurations
 ├── scripts/          # Utility and automation scripts (CI/CD helpers, setup, etc.)
+├── docs/             # Infrastructure documentation, architecture, and operational guides
 └── README.md
 ```
 
@@ -23,6 +24,7 @@ spotq-infra/
 | `terraform/`     | Cloud resource provisioning (VPC, EKS, RDS, S3, IAM, etc.)    |
 | `monitoring/`    | Prometheus, Grafana, and alerting rule configurations         |
 | `scripts/`       | Deployment scripts, environment bootstrapping, and helpers    |
+| `docs/`          | Infrastructure documentation, architecture diagrams, setup guides, runbooks, and operational documentation    |
 
 ---
 

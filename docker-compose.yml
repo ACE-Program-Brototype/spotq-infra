@@ -392,18 +392,23 @@ services:
     image: grafana/alloy:v1.3.0
     container_name: spotq-alloy
     restart: unless-stopped
+
     ports:
       - "12345:12345"
+
+    volumes:
+      - ./monitoring/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy/data
+
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+
     networks:
       - spotq-backend
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.2"
-          memory: 128M
 
 # ─── Networks ──────────────────────────────────────────────────────────────────
 networks:
@@ -427,3 +432,5 @@ volumes:
     name: spotq-loki-data
   tempo-data:
     name: spotq-tempo-data
+  alloy-data:
+    name: spotq-alloy-data

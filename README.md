@@ -28,6 +28,39 @@ spotq-infra/
 
 ---
 
+## Docker Setup
+
+This repository contains the central Docker Compose configuration to spin up the entire **SpotQ** platform (microservices, database, caching, queue, and API gateway) locally.
+
+### Prerequisites
+
+- **Docker Desktop** installed and running.
+- **Infisical CLI** installed and authenticated.
+
+### Running the Services
+
+1. Log in to Infisical:
+   ```bash
+   infisical login
+   ```
+
+2. Start the services with environment variables injected via Infisical:
+   ```bash
+   infisical run --env=dev -- docker compose up
+   ```
+
+   *To run in detached mode, append the `-d` flag:*
+   ```bash
+   infisical run --env=dev -- docker compose up -d
+   ```
+
+3. Stop the services:
+   ```bash
+   docker compose down
+   ```
+
+---
+
 ## Branching Strategy
 
 This repository follows a **three-branch** workflow:

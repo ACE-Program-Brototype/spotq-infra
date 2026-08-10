@@ -4,3 +4,9 @@ global:
 
   external_labels:
     platform: spotq
+  
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093

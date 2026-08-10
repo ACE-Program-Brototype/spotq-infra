@@ -393,6 +393,15 @@ services:
     restart: unless-stopped
     ports:
       - "9093:9093"
+
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+
+    volumes:
+    - ./monitoring/alertmanager/config.yml:/etc/alertmanager/alertmanager.yml:ro
+    - alertmanager-data:/alertmanager
+
     networks:
       - spotq-backend
     deploy:

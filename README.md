@@ -124,6 +124,49 @@ ci: add terraform plan step to PR pipeline
 
 ---
 
+## Terraform Quick Start
+
+Yes — you can push Terraform code to Git. Do not commit secrets, credentials, local state files, or generated Terraform folders.
+
+### Commit these
+- Terraform source files such as `.tf`, `.tfvars.example`, and module directories
+- Documentation and setup scripts
+
+### Do not commit
+- AWS access keys or secret values
+- Local state files such as `terraform.tfstate`
+- The `.terraform/` folder
+- Real `.tfvars` files that contain environment-specific secrets
+
+### AWS CLI setup
+```bash
+aws configure
+# or for a named profile
+aws configure --profile dev
+```
+
+### Verify your AWS identity
+```bash
+aws sts get-caller-identity
+aws sts get-caller-identity --profile dev
+```
+
+### Terraform commands
+```bash
+cd terraform/enviornment/development
+terraform init
+terraform validate
+terraform plan
+terraform apply
+```
+
+To remove the infrastructure later:
+```bash
+terraform destroy
+```
+
+---
+
 ## License
 
 This repository is private and proprietary to the SpotQ team. Unauthorized distribution is prohibited.

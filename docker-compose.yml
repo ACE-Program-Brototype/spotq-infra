@@ -363,11 +363,17 @@ services:
     image: grafana/tempo:2.5.0
     container_name: spotq-tempo
     restart: unless-stopped
+
     ports:
       - "3200:3200"
       - "4317:4317"
       - "4318:4318"
+    
+    command: 
+      - -config.file=/etc/tempo/tempo.yaml
+  
     volumes:
+      - ./monitoring/tempo/config.yml:/etc/tempo/tempo.yaml:ro
       - tempo-data:/var/tempo
     networks:
       - spotq-backend

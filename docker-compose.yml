@@ -313,21 +313,22 @@ services:
     image: grafana/grafana:11.1.3
     container_name: spotq-grafana
     restart: unless-stopped
+
     ports:
       - "3006:3000"
+
     volumes:
+      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
+
     networks:
       - spotq-backend
       - spotq-frontend
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.2"
-          memory: 128M
+
+    environment:
+      INFISICAL_TOKEN: st.2b118315-6eb9-4c33-931b-ae20b5ee813a.bbd58b0810ffcd583089769e33a6eda3.c88edbbd5058c90bde225498ae1fa196
 
   # ─── Observability: Loki ────────────────────────────────────────────────────
   loki:

@@ -328,7 +328,7 @@ services:
       - spotq-frontend
 
     environment:
-      INFISICAL_TOKEN: st.2b118315-6eb9-4c33-931b-ae20b5ee813a.bbd58b0810ffcd583089769e33a6eda3.c88edbbd5058c90bde225498ae1fa196
+      INFISICAL_TOKEN:${GRAFANA_INFISICAL_TOKEN}
 
   # ─── Observability: Loki ────────────────────────────────────────────────────
   loki:

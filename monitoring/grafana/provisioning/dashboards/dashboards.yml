@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: SpotQ
+    orgId: 1
+    folder: SpotQ
+    type: file
+    disableDeletion: true
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true

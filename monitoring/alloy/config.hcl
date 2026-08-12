@@ -3,7 +3,6 @@ logging {
   format = "logfmt"
 }
 
-
 discovery.docker "spotq" {
   host = "unix:///var/run/docker.sock"
 }
@@ -14,7 +13,7 @@ loki.source.docker "spotq" {
   targets = discovery.docker.spotq.targets
 
   labels = {
-    platform = "spotq"
+    platform = "spotq",
   }
 
   forward_to = [
@@ -27,7 +26,6 @@ loki.write "spotq" {
     url = "http://loki:3100/loki/api/v1/push"
   }
 }
-
 
 prometheus.scrape "spotq" {
   targets = [

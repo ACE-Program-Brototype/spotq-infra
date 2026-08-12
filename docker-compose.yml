@@ -138,7 +138,7 @@ services:
   order-service:
     build:
       context: ../spotq-order-service
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
 
     container_name: spotq-order-service
 

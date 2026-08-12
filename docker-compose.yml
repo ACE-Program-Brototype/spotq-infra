@@ -461,3 +461,5 @@ volumes:
     name: spotq-tempo-data
   alloy-data:
     name: spotq-alloy-data
+  alertmanager-data:
+    name: spotq-alertmanager-data

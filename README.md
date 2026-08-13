@@ -13,6 +13,7 @@ spotq-infra/
 ├── terraform/        # Infrastructure as Code (IaC) for cloud provisioning
 ├── monitoring/       # Monitoring, alerting, and observability configurations
 ├── scripts/          # Utility and automation scripts (CI/CD helpers, setup, etc.)
+├── docs/             # Infrastructure documentation, architecture, and operational guides
 └── README.md
 ```
 
@@ -23,6 +24,40 @@ spotq-infra/
 | `terraform/`     | Cloud resource provisioning (VPC, EKS, RDS, S3, IAM, etc.)    |
 | `monitoring/`    | Prometheus, Grafana, and alerting rule configurations         |
 | `scripts/`       | Deployment scripts, environment bootstrapping, and helpers    |
+| `docs/`          | Infrastructure documentation, architecture diagrams, setup guides, runbooks, and operational documentation    |
+
+---
+
+## Docker Setup
+
+This repository contains the central Docker Compose configuration to spin up the entire **SpotQ** platform (microservices, database, caching, queue, and API gateway) locally.
+
+### Prerequisites
+
+- **Docker Desktop** installed and running.
+- **Infisical CLI** installed and authenticated.
+
+### Running the Services
+
+1. Log in to Infisical:
+   ```bash
+   infisical login
+   ```
+
+2. Start the services with environment variables injected via Infisical:
+   ```bash
+   infisical run --env=dev -- docker compose up
+   ```
+
+   *To run in detached mode, append the `-d` flag:*
+   ```bash
+   infisical run --env=dev -- docker compose up -d
+   ```
+
+3. Stop the services:
+   ```bash
+   docker compose down
+   ```
 
 ---
 
@@ -121,49 +156,6 @@ ci: add terraform plan step to PR pipeline
 - [ ] Configurations are parameterized (no hardcoded values)
 - [ ] Changes have been tested in the appropriate environment
 - [ ] Documentation is updated if applicable
-
----
-
-## Terraform Quick Start
-
-Yes — you can push Terraform code to Git. Do not commit secrets, credentials, local state files, or generated Terraform folders.
-
-### Commit these
-- Terraform source files such as `.tf`, `.tfvars.example`, and module directories
-- Documentation and setup scripts
-
-### Do not commit
-- AWS access keys or secret values
-- Local state files such as `terraform.tfstate`
-- The `.terraform/` folder
-- Real `.tfvars` files that contain environment-specific secrets
-
-### AWS CLI setup
-```bash
-aws configure
-# or for a named profile
-aws configure --profile dev
-```
-
-### Verify your AWS identity
-```bash
-aws sts get-caller-identity
-aws sts get-caller-identity --profile dev
-```
-
-### Terraform commands
-```bash
-cd terraform/enviornment/development
-terraform init
-terraform validate
-terraform plan
-terraform apply
-```
-
-To remove the infrastructure later:
-```bash
-terraform destroy
-```
 
 ---
 

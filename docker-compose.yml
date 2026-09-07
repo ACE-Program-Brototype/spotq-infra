@@ -280,6 +280,22 @@ services:
         max-size: "20m"
         max-file: "5"
 
+    redis:
+      image: redis:7-alpine
+      container_name: spotq-redis
+      restart: unless-stopped
+
+      ports:
+        - "6379:6379"
+
+      volumes:
+        - redis-data:/data
+
+      command: redis-server --appendonly yes
+
+      networks:
+        - spotq-backend
+
 
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -457,3 +473,5 @@ volumes:
     name: spotq-alloy-data
   alertmanager-data:
     name: spotq-alertmanager-data
+  redis-data:
+    name: spotq-redis-data

@@ -69,6 +69,11 @@ services:
 
     networks:
       - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+    
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1" ]
       interval: 15s
@@ -106,6 +111,11 @@ services:
 
     networks:
       - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+    
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1" ]
       interval: 15s
@@ -143,6 +153,10 @@ services:
 
     networks:
       - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3002/health || exit 1" ]
@@ -182,6 +196,10 @@ services:
     networks:
       - spotq-backend
 
+    depends_on:
+      redis:
+        condition: service_healthy
+
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3003/health || exit 1" ]
       interval: 15s
@@ -219,6 +237,10 @@ services:
 
     networks:
       - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3004/health || exit 1" ]
@@ -280,6 +302,42 @@ services:
         max-size: "20m"
         max-file: "5"
 
+  redis:
+    image: redis:7-alpine
+    container_name: spotq-redis
+    restart: unless-stopped
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis-data:/data
+
+    command: redis-server --appendonly yes
+
+    networks:
+      - spotq-backend
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
 
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -457,3 +515,5 @@ volumes:
     name: spotq-alloy-data
   alertmanager-data:
     name: spotq-alertmanager-data
+  redis-data:
+    name: spotq-redis-data

@@ -356,7 +356,7 @@ services:
         max-file: "5"
 
   rabbitmq:
-    image: rabbitmq:management-alpine
+    image: rabbitmq:4.0-management-alpine
     container_name: spotq-rabbitmq
     hostname: spotq-rabbitmq
     restart: unless-stopped

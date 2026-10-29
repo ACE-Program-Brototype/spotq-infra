@@ -73,6 +73,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1" ]
@@ -114,6 +116,8 @@ services:
 
     depends_on:
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     
     healthcheck:
@@ -157,6 +161,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3002/health || exit 1" ]
@@ -198,6 +204,8 @@ services:
 
     depends_on:
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
     healthcheck:
@@ -241,6 +249,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3004/health || exit 1" ]
@@ -279,6 +289,12 @@ services:
 
     networks:
       - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1" ]
@@ -332,6 +348,48 @@ services:
         reservations:
           cpus: "0.1"
           memory: 64M
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: spotq-rabbitmq
+    hostname: spotq-rabbitmq
+    restart: unless-stopped
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+    networks:
+      - spotq-backend
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
 
     logging:
       driver: json-file
@@ -517,3 +575,5 @@ volumes:
     name: spotq-alertmanager-data
   redis-data:
     name: spotq-redis-data
+  rabbitmq-data:
+    name: spotq-rabbitmq-data

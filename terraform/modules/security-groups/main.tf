@@ -5,36 +5,49 @@ resource "aws_security_group" "spotq_sg" {
   description = var.description
   vpc_id      = aws_default_vpc.default.id
 
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  tags = var.tags
+}
 
-  ingress {
-    description = "HTTP"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_vpc_security_group_ingress_rule" "ssh" {
+  for_each = toset(var.allowed_ssh_cidr_blocks)
 
-  ingress {
-    description = "HTTPS"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  security_group_id = aws_security_group.spotq_sg.id
+  description       = "SSH access"
+  cidr_ipv4         = each.value
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "http" {
+  security_group_id = aws_security_group.spotq_sg.id
+  description       = "HTTP access"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "https" {
+  security_group_id = aws_security_group.spotq_sg.id
+  description       = "HTTPS access"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+
+  tags = var.tags
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_outbound" {
+  security_group_id = aws_security_group.spotq_sg.id
+  description       = "Allow all outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 
   tags = var.tags
 }

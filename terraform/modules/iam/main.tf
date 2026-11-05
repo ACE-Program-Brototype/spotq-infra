@@ -31,9 +31,9 @@ resource "aws_iam_policy" "s3_scoped_access" {
         Resource = var.s3_bucket_arn
       },
       {
-        Sid      = "ManageTargetBucketObjects"
-        Effect   = "Allow"
-        Action   = [
+        Sid    = "ManageTargetBucketObjects"
+        Effect = "Allow"
+        Action = [
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject"

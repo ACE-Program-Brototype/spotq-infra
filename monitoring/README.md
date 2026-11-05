@@ -12,12 +12,12 @@ The observability platform is designed to provide a single monitoring interface 
 
 The SpotQ monitoring platform is built using the Grafana observability stack:
 
-* **Grafana** — Visualization and observability interface
-* **Prometheus** — Metrics collection and storage
-* **Loki** — Log aggregation and storage
-* **Grafana Tempo** — Distributed trace storage
-* **Grafana Alloy** — Telemetry collection and processing
-* **Alertmanager** — Alert management and routing
+* **Grafana** - Visualization and observability interface
+* **Prometheus** - Metrics collection and storage
+* **Loki** - Log aggregation and storage
+* **Grafana Tempo** - Distributed trace storage
+* **Grafana Alloy** - Telemetry collection and processing
+* **Alertmanager** - Alert management and routing
 
 The platform provides:
 

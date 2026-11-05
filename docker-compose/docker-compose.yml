@@ -4,7 +4,7 @@ services:
 
   api-gateway:
     build:
-      context: ../spotq-api-gateway
+      context: ../../spotq-api-gateway
       dockerfile: Dockerfile
 
     container_name: spotq-api-gateway
@@ -20,24 +20,24 @@ services:
       - spotq-backend
     depends_on:
       user-service:
-        condition: service_started
+        condition: service_healthy
       restaurant-service:
-        condition: service_started
+        condition: service_healthy
       order-service:
-        condition: service_started
+        condition: service_healthy
       payment-service:
-        condition: service_started
+        condition: service_healthy
       queue-service:
-        condition: service_started
+        condition: service_healthy
       ml-eta-service:
-        condition: service_started
+        condition: service_healthy
 
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:10000/healthz || exit 1" ]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:10000/healthz || curl -fsS http://localhost:10000/healthz || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 20s
 
     deploy:
       resources:
@@ -57,7 +57,7 @@ services:
   # ─── Microservice: User Service ─────────────────────────────────────────
   user-service:
     build:
-      context: ../spotq-user-service
+      context: ../../spotq-user-service
       dockerfile: Dockerfile
 
     container_name: spotq-user-service
@@ -77,8 +77,8 @@ services:
         condition: service_healthy
     
     healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1" ]
-      interval: 15s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3000/health || curl -fsS http://localhost:3000/health || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 20s
@@ -101,7 +101,7 @@ services:
 
   restaurant-service:
     build:
-      context: ../spotq-restaurant-service
+      context: ../../spotq-restaurant-service
       dockerfile: Dockerfile
 
     container_name: spotq-restaurant-service
@@ -121,8 +121,8 @@ services:
         condition: service_healthy
     
     healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3001/health || exit 1" ]
-      interval: 15s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3001/health || curl -fsS http://localhost:3001/health || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 20s
@@ -145,7 +145,7 @@ services:
 
   order-service:
     build:
-      context: ../spotq-order-service
+      context: ../../spotq-order-service
       dockerfile: Dockerfile
 
     container_name: spotq-order-service
@@ -165,8 +165,8 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3002/health || exit 1" ]
-      interval: 15s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3002/health || curl -fsS http://localhost:3002/health || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 20s
@@ -189,7 +189,7 @@ services:
 
   payment-service:
     build:
-      context: ../spotq-payment-service
+      context: ../../spotq-payment-service
       dockerfile: Dockerfile
 
     container_name: spotq-payment-service
@@ -209,8 +209,8 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3003/health || exit 1" ]
-      interval: 15s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3003/health || curl -fsS http://localhost:3003/health || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 20s
@@ -233,7 +233,7 @@ services:
 
   queue-service:
     build:
-      context: ../spotq-queue-service
+      context: ../../spotq-queue-service
       dockerfile: Dockerfile
 
     container_name: spotq-queue-service
@@ -253,8 +253,8 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3004/health || exit 1" ]
-      interval: 15s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3004/health || curl -fsS http://localhost:3004/health || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 20s
@@ -277,7 +277,7 @@ services:
 
   ml-eta-service:
     build:
-      context: ../spotq-ml-eta-service
+      context: ../../spotq-ml-eta-service
       dockerfile: Dockerfile
 
     container_name: spotq-ml-eta-service
@@ -297,8 +297,8 @@ services:
         condition: service_healthy
 
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1" ]
-      interval: 15s
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8000/healthz || curl -fsS http://localhost:8000/healthz || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 20s
@@ -336,9 +336,10 @@ services:
 
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 5s
 
     deploy:
       resources:
@@ -398,6 +399,7 @@ services:
         max-file: "5"
 
   prometheus:
+    profiles: ["monitoring"]
     image: prom/prometheus:v2.54.1
     container_name: spotq-prometheus
     restart: unless-stopped
@@ -406,7 +408,7 @@ services:
       - "9090:9090"
 
     volumes:
-      - ./monitoring/prometheus/config.yml:/etc/prometheus/prometheus.yml:ro
+      - ../monitoring/prometheus/config.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
 
     command:
@@ -420,6 +422,7 @@ services:
 
 
   grafana:
+    profiles: ["monitoring"]
     image: grafana/grafana:11.1.3
     container_name: spotq-grafana
     restart: unless-stopped
@@ -428,9 +431,9 @@ services:
       - "3006:3000"
 
     volumes:
-      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ../monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
 
     networks:
@@ -443,6 +446,7 @@ services:
 
  
   loki:
+    profiles: ["monitoring"]
     image: grafana/loki:3.1.1
     container_name: spotq-loki
     restart: unless-stopped
@@ -454,7 +458,7 @@ services:
       - -config.file=/etc/loki/config.yaml
 
     volumes:
-      - ./monitoring/loki/config.yml:/etc/loki/config.yaml:ro
+      - ../monitoring/loki/config.yml:/etc/loki/config.yaml:ro
       - loki-data:/loki
 
     networks:
@@ -471,6 +475,7 @@ services:
 
 
   tempo:
+    profiles: ["monitoring"]
     image: grafana/tempo:2.5.0
     container_name: spotq-tempo
     restart: unless-stopped
@@ -484,7 +489,7 @@ services:
       - -config.file=/etc/tempo/tempo.yaml
   
     volumes:
-      - ./monitoring/tempo/config.yml:/etc/tempo/tempo.yaml:ro
+      - ../monitoring/tempo/config.yml:/etc/tempo/tempo.yaml:ro
       - tempo-data:/var/tempo
     networks:
       - spotq-backend
@@ -499,6 +504,7 @@ services:
 
   
   alertmanager:
+    profiles: ["monitoring"]
     image: prom/alertmanager:v0.27.0
     container_name: spotq-alertmanager
     restart: unless-stopped
@@ -510,7 +516,7 @@ services:
       - --storage.path=/alertmanager
 
     volumes:
-    - ./monitoring/alertmanager/config.yml:/etc/alertmanager/alertmanager.yml:ro
+    - ../monitoring/alertmanager/config.yml:/etc/alertmanager/alertmanager.yml:ro
     - alertmanager-data:/alertmanager
 
     networks:
@@ -526,6 +532,7 @@ services:
 
 
   alloy:
+    profiles: ["monitoring"]
     image: grafana/alloy:v1.3.0
     container_name: spotq-alloy
     restart: unless-stopped
@@ -534,7 +541,7 @@ services:
       - "12345:12345"
 
     volumes:
-      - ./monitoring/alloy/config.hcl:/etc/alloy/config.alloy:ro
+      - ../monitoring/alloy/config.hcl:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - alloy-data:/var/lib/alloy/data
 

@@ -46,16 +46,30 @@ This repository contains the central Docker Compose configuration to spin up the
 
 2. Start the services with environment variables injected via Infisical:
    ```bash
+   cd docker-compose
    infisical run --env=dev -- docker compose up
+   ```
+
+   *Or from the repository root:*
+   ```bash
+   infisical run --env=dev -- docker compose -f docker-compose/docker-compose.yml up
+   ```
+
+   *To run services with the full observability stack (Grafana, Prometheus, Loki, Tempo, Alloy, Alertmanager):*
+   ```bash
+   cd docker-compose
+   infisical run --env=dev -- docker compose --profile monitoring up
    ```
 
    *To run in detached mode, append the `-d` flag:*
    ```bash
+   cd docker-compose
    infisical run --env=dev -- docker compose up -d
    ```
 
 3. Stop the services:
    ```bash
+   cd docker-compose
    docker compose down
    ```
 

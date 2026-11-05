@@ -7,10 +7,25 @@ discovery.docker "spotq" {
   host = "unix:///var/run/docker.sock"
 }
 
+discovery.relabel "spotq" {
+  targets = discovery.docker.spotq.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/?(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+}
+
 loki.source.docker "spotq" {
   host = "unix:///var/run/docker.sock"
 
-  targets = discovery.docker.spotq.targets
+  targets = discovery.relabel.spotq.output
 
   labels = {
     platform = "spotq",

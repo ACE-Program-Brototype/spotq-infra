@@ -30,6 +30,11 @@ loki.write "spotq" {
 prometheus.scrape "spotq" {
   targets = [
     {
+      "__address__"      = "api-gateway:9901",
+      "__metrics_path__" = "/stats/prometheus",
+      "service"          = "api-gateway",
+    },
+    {
       "__address__" = "user-service:3000",
       "service"     = "user-service",
     },
@@ -54,6 +59,18 @@ prometheus.scrape "spotq" {
       "service"     = "ml-eta-service",
     },
   ]
+
+  forward_to = [
+    prometheus.remote_write.spotq.receiver,
+  ]
+}
+
+prometheus.exporter.redis "spotq" {
+  redis_addr = "redis:6379"
+}
+
+prometheus.scrape "redis" {
+  targets = prometheus.exporter.redis.spotq.targets
 
   forward_to = [
     prometheus.remote_write.spotq.receiver,

@@ -29,3 +29,9 @@ variable "allowed_ssh_cidr_blocks" {
   type        = list(string)
   default     = []
 }
+
+variable "s3_allowed_origins" {
+  description = "Allowed origins for S3 CORS policy"
+  type        = list(string)
+  default     = ["*"]
+}

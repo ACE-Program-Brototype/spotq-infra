@@ -1,8 +1,9 @@
 module "s3" {
   source = "../../modules/s3"
 
-  bucket_name = "${local.resource_prefix}-assets"
-  tags        = local.common_tags
+  bucket_name     = "${local.resource_prefix}-assets"
+  allowed_origins = var.s3_allowed_origins
+  tags            = local.common_tags
 }
 
 module "security" {

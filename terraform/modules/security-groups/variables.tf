@@ -14,6 +14,12 @@ variable "allowed_ssh_cidr_blocks" {
   default     = []
 }
 
+variable "app_port" {
+  description = "Port used by API Gateway application container"
+  type        = number
+  default     = 10000
+}
+
 variable "tags" {
   description = "Resource tags"
   type        = map(string)

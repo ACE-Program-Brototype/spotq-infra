@@ -43,6 +43,17 @@ resource "aws_vpc_security_group_ingress_rule" "https" {
   tags = var.tags
 }
 
+resource "aws_vpc_security_group_ingress_rule" "app_gateway" {
+  security_group_id = aws_security_group.spotq_sg.id
+  description       = "API Gateway application ingress"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = var.app_port
+  to_port           = var.app_port
+  ip_protocol       = "tcp"
+
+  tags = var.tags
+}
+
 resource "aws_vpc_security_group_egress_rule" "all_outbound" {
   security_group_id = aws_security_group.spotq_sg.id
   description       = "Allow all outbound traffic"

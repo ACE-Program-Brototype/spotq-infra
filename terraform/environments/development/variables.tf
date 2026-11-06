@@ -35,3 +35,9 @@ variable "s3_allowed_origins" {
   type        = list(string)
   default     = ["*"]
 }
+
+variable "app_port" {
+  description = "Port used by API Gateway application container"
+  type        = number
+  default     = 10000
+}

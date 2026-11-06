@@ -12,6 +12,7 @@ module "security" {
   security_group_name     = "${local.resource_prefix}-sg"
   description             = "Security Group for SpotQ"
   allowed_ssh_cidr_blocks = var.allowed_ssh_cidr_blocks
+  app_port                = var.app_port
   tags                    = local.common_tags
 }
 

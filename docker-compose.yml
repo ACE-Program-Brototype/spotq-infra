@@ -4,7 +4,7 @@ services:
 
   api-gateway:
     build:
-      context: ../../spotq-api-gateway
+      context: ../spotq-api-gateway
       dockerfile: Dockerfile
 
     container_name: spotq-api-gateway
@@ -57,7 +57,7 @@ services:
   # ─── Microservice: User Service ─────────────────────────────────────────
   user-service:
     build:
-      context: ../../spotq-user-service
+      context: ../spotq-user-service
       dockerfile: Dockerfile
 
     container_name: spotq-user-service
@@ -101,7 +101,7 @@ services:
 
   restaurant-service:
     build:
-      context: ../../spotq-restaurant-service
+      context: ../spotq-restaurant-service
       dockerfile: Dockerfile
 
     container_name: spotq-restaurant-service
@@ -145,7 +145,7 @@ services:
 
   order-service:
     build:
-      context: ../../spotq-order-service
+      context: ../spotq-order-service
       dockerfile: Dockerfile
 
     container_name: spotq-order-service
@@ -189,7 +189,7 @@ services:
 
   payment-service:
     build:
-      context: ../../spotq-payment-service
+      context: ../spotq-payment-service
       dockerfile: Dockerfile
 
     container_name: spotq-payment-service
@@ -233,7 +233,7 @@ services:
 
   queue-service:
     build:
-      context: ../../spotq-queue-service
+      context: ../spotq-queue-service
       dockerfile: Dockerfile
 
     container_name: spotq-queue-service
@@ -277,7 +277,7 @@ services:
 
   ml-eta-service:
     build:
-      context: ../../spotq-ml-eta-service
+      context: ../spotq-ml-eta-service
       dockerfile: Dockerfile
 
     container_name: spotq-ml-eta-service
@@ -408,7 +408,7 @@ services:
       - "9090:9090"
 
     volumes:
-      - ../monitoring/prometheus/config.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/config.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
 
     command:
@@ -431,9 +431,9 @@ services:
       - "3006:3000"
 
     volumes:
-      - ../monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
-      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
 
     networks:
@@ -458,7 +458,7 @@ services:
       - -config.file=/etc/loki/config.yaml
 
     volumes:
-      - ../monitoring/loki/config.yml:/etc/loki/config.yaml:ro
+      - ./monitoring/loki/config.yml:/etc/loki/config.yaml:ro
       - loki-data:/loki
 
     networks:
@@ -489,7 +489,7 @@ services:
       - -config.file=/etc/tempo/tempo.yaml
   
     volumes:
-      - ../monitoring/tempo/config.yml:/etc/tempo/tempo.yaml:ro
+      - ./monitoring/tempo/config.yml:/etc/tempo/tempo.yaml:ro
       - tempo-data:/var/tempo
     networks:
       - spotq-backend
@@ -516,7 +516,7 @@ services:
       - --storage.path=/alertmanager
 
     volumes:
-    - ../monitoring/alertmanager/config.yml:/etc/alertmanager/alertmanager.yml:ro
+    - ./monitoring/alertmanager/config.yml:/etc/alertmanager/alertmanager.yml:ro
     - alertmanager-data:/alertmanager
 
     networks:
@@ -541,7 +541,7 @@ services:
       - "12345:12345"
 
     volumes:
-      - ../monitoring/alloy/config.hcl:/etc/alloy/config.alloy:ro
+      - ./monitoring/alloy/config.hcl:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - alloy-data:/var/lib/alloy/data
 

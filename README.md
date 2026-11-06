@@ -8,29 +8,29 @@ Infrastructure repository for the **SpotQ** platform — containing DevOps confi
 
 ```
 spotq-infra/
-├── docker-compose/   # Docker Compose files for local and staging environments
-├── kubernetes/       # Kubernetes manifests, Helm charts, and cluster configs
-├── terraform/        # Infrastructure as Code (IaC) for cloud provisioning
-├── monitoring/       # Monitoring, alerting, and observability configurations
-├── scripts/          # Utility and automation scripts (CI/CD helpers, setup, etc.)
-├── docs/             # Infrastructure documentation, architecture, and operational guides
+├── docker-compose.yml # Central Docker Compose specification for local and staging
+├── kubernetes/        # Kubernetes manifests, Helm charts, and cluster configs
+├── terraform/         # Infrastructure as Code (IaC) for cloud provisioning
+├── monitoring/        # Monitoring, alerting, and observability configurations
+├── scripts/           # Utility and automation scripts (CI/CD helpers, setup, etc.)
+├── docs/              # Infrastructure documentation, architecture, and operational guides
 └── README.md
 ```
 
-| Directory        | Purpose                                                       |
-| ---------------- | ------------------------------------------------------------- |
-| `docker-compose/`| Service definitions for local development and staging setups  |
-| `kubernetes/`    | K8s deployments, services, ingress, configmaps, and secrets   |
-| `terraform/`     | Cloud resource provisioning (VPC, EKS, RDS, S3, IAM, etc.)    |
-| `monitoring/`    | Prometheus, Grafana, and alerting rule configurations         |
-| `scripts/`       | Deployment scripts, environment bootstrapping, and helpers    |
-| `docs/`          | Infrastructure documentation, architecture diagrams, setup guides, runbooks, and operational documentation    |
+| File / Directory     | Purpose                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `docker-compose.yml` | Multi-container service definitions for local development     |
+| `kubernetes/`        | K8s deployments, services, ingress, configmaps, and secrets   |
+| `terraform/`         | Cloud resource provisioning (VPC, EKS, RDS, S3, IAM, etc.)    |
+| `monitoring/`        | Prometheus, Grafana, Alloy, Loki, Tempo, and Alertmanager     |
+| `scripts/`           | Deployment scripts, environment bootstrapping, and helpers    |
+| `docs/`              | Infrastructure documentation, architecture diagrams, runbooks |
 
 ---
 
 ## Docker Setup
 
-This repository contains the central Docker Compose configuration to spin up the entire **SpotQ** platform (microservices, database, caching, queue, and API gateway) locally.
+This repository contains the central Docker Compose configuration to spin up the entire **SpotQ** platform (microservices, database, caching, queue, API gateway, and observability) locally.
 
 ### Prerequisites
 
@@ -44,32 +44,23 @@ This repository contains the central Docker Compose configuration to spin up the
    infisical login
    ```
 
-2. Start the services with environment variables injected via Infisical:
+2. Start the application services with environment variables injected via Infisical:
    ```bash
-   cd docker-compose
    infisical run --env=dev -- docker compose up
-   ```
-
-   *Or from the repository root:*
-   ```bash
-   infisical run --env=dev -- docker compose -f docker-compose/docker-compose.yml up
    ```
 
    *To run services with the full observability stack (Grafana, Prometheus, Loki, Tempo, Alloy, Alertmanager):*
    ```bash
-   cd docker-compose
    infisical run --env=dev -- docker compose --profile monitoring up
    ```
 
    *To run in detached mode, append the `-d` flag:*
    ```bash
-   cd docker-compose
-   infisical run --env=dev -- docker compose up -d
+   infisical run --env=dev -- docker compose --profile monitoring up -d
    ```
 
 3. Stop the services:
    ```bash
-   cd docker-compose
    docker compose down
    ```
 

@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# Suppress interactive prompts during automated package installations
+export DEBIAN_FRONTEND=noninteractive
+
 # Update system package repositories
 apt-get update -y
 

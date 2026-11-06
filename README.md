@@ -30,12 +30,29 @@ spotq-infra/
 
 ## Docker Setup
 
-This repository contains the central Docker Compose configuration to spin up the entire **SpotQ** platform (microservices, database, caching, queue, API gateway, and observability) locally.
+This repository contains the central `docker-compose.yml` configuration at the repository root to orchestrate the entire **SpotQ** platform (microservices, datastores, caching, message queues, API gateway, and observability stack) locally.
+
+### Workspace Layout & Sibling Repositories
+
+The Docker Compose configuration resolves microservice build contexts relative to the repository root (`../spotq-*`). Ensure sibling microservice repositories are checked out side-by-side with `spotq-infra` in the same parent folder:
+
+```
+<workspace>/
+├── spotq-infra/             # This repository (contains root docker-compose.yml)
+├── spotq-api-gateway/       # Envoy API Gateway
+├── spotq-user-service/      # User management microservice
+├── spotq-restaurant-service/# Restaurant management microservice
+├── spotq-order-service/     # Order processing microservice
+├── spotq-payment-service/   # Payment processing microservice
+├── spotq-queue-service/     # Queue management microservice
+└── spotq-ml-eta-service/    # ML ETA prediction microservice
+```
 
 ### Prerequisites
 
 - **Docker Desktop** installed and running.
 - **Infisical CLI** installed and authenticated.
+- Reference environment configuration (documented in `.env.example`).
 
 ### Running the Services
 
@@ -44,25 +61,37 @@ This repository contains the central Docker Compose configuration to spin up the
    infisical login
    ```
 
-2. Start the application services with environment variables injected via Infisical:
+2. **Core Microservices Only** (App services, Redis, RabbitMQ, Envoy API Gateway):
    ```bash
-   infisical run --env=dev -- docker compose up
+   infisical run --env=dev -- docker compose up -d
    ```
 
-   *To run services with the full observability stack (Grafana, Prometheus, Loki, Tempo, Alloy, Alertmanager):*
-   ```bash
-   infisical run --env=dev -- docker compose --profile monitoring up
-   ```
-
-   *To run in detached mode, append the `-d` flag:*
+3. **Core Microservices + Full Observability Stack** (Grafana, Prometheus, Loki, Tempo, Alloy, Alertmanager):
    ```bash
    infisical run --env=dev -- docker compose --profile monitoring up -d
    ```
 
-3. Stop the services:
+4. **Monitoring Stack Only** (Observability components without running microservices):
    ```bash
-   docker compose down
+   infisical run --env=dev -- docker compose --profile monitoring up -d grafana prometheus alloy loki tempo alertmanager
    ```
+
+5. **Stop All Services**:
+   ```bash
+   docker compose --profile monitoring down
+   ```
+
+### Service Ports & Access Points
+
+| Service | Host Port | Purpose & Security Notes |
+| :--- | :--- | :--- |
+| **API Gateway** | `http://localhost:10000` | Ingress routing to microservices |
+| **Envoy Admin** | `http://127.0.0.1:9901` | Admin & metrics interface (strictly bound to `127.0.0.1` for security) |
+| **Grafana** | `http://localhost:3006` | Observability dashboards (`admin` / `admin` or `spotq` / `admin`) |
+| **Prometheus** | `http://localhost:9090` | Target metrics & scrape status (`/targets`) |
+| **Grafana Alloy** | `http://localhost:12345` | OpenTelemetry collector & pipeline dashboard |
+| **RabbitMQ Management** | `http://localhost:15672` | AMQP broker management (`guest` / `guest`) |
+| **Redis** | `localhost:6379` | Feature store & session caching |
 
 ---
 

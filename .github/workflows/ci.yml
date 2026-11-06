@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - development
+      - "refactor/**"
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  validate-terraform:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - name: Check Terraform Formatting
+        run: terraform fmt -check -recursive terraform/
+
+      - name: Initialize Terraform (Validation Mode)
+        run: terraform -chdir=terraform/environments/development init -backend=false
+
+      - name: Validate Terraform Configuration
+        run: terraform -chdir=terraform/environments/development validate
+
+  validate-docker-compose:
+    name: Validate Docker Compose
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: docker compose --env-file .env.example config -q

@@ -1,11 +1,26 @@
 variable "security_group_name" {
-  type = string
+  description = "Name of the security group"
+  type        = string
 }
 
 variable "description" {
-  type = string
+  description = "Description of the security group"
+  type        = string
+}
+
+variable "allowed_ssh_cidr_blocks" {
+  description = "List of IPv4 CIDR blocks permitted for SSH ingress"
+  type        = list(string)
+  default     = []
+}
+
+variable "app_port" {
+  description = "Port used by API Gateway application container"
+  type        = number
+  default     = 10000
 }
 
 variable "tags" {
-  type = map(string)
+  description = "Resource tags"
+  type        = map(string)
 }

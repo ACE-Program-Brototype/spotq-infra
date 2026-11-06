@@ -1,0 +1,6 @@
+aws_region              = "ap-south-1"
+environment             = "dev"
+project_name            = "spotq"
+instance_type           = "t3.micro"
+key_name                = "spotq-dev-key"
+allowed_ssh_cidr_blocks = ["YOUR_IP_ADDRESS/32"]

@@ -8,6 +8,11 @@ variable "instance_profile_name" {
   type        = string
 }
 
+variable "s3_bucket_arn" {
+  description = "ARN of the target S3 bucket for scoped access"
+  type        = string
+}
+
 variable "tags" {
   description = "Common Tags"
   type        = map(string)

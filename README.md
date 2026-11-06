@@ -9,22 +9,16 @@ Infrastructure repository for the **SpotQ** platform — containing DevOps confi
 ```
 spotq-infra/
 ├── docker-compose.yml # Central Docker Compose specification for local and staging
-├── kubernetes/        # Kubernetes manifests, Helm charts, and cluster configs
 ├── terraform/         # Infrastructure as Code (IaC) for cloud provisioning
 ├── monitoring/        # Monitoring, alerting, and observability configurations
-├── scripts/           # Utility and automation scripts (CI/CD helpers, setup, etc.)
-├── docs/              # Infrastructure documentation, architecture, and operational guides
 └── README.md
 ```
 
 | File / Directory     | Purpose                                                       |
 | -------------------- | ------------------------------------------------------------- |
 | `docker-compose.yml` | Multi-container service definitions for local development     |
-| `kubernetes/`        | K8s deployments, services, ingress, configmaps, and secrets   |
 | `terraform/`         | Cloud resource provisioning (VPC, EKS, RDS, S3, IAM, etc.)    |
 | `monitoring/`        | Prometheus, Grafana, Alloy, Loki, Tempo, and Alertmanager     |
-| `scripts/`           | Deployment scripts, environment bootstrapping, and helpers    |
-| `docs/`              | Infrastructure documentation, architecture diagrams, runbooks |
 
 ---
 

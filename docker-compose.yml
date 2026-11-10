@@ -207,6 +207,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      gotenberg:
+        condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:3003/health || curl -fsS http://localhost:3003/health || exit 1" ]
@@ -391,6 +393,47 @@ services:
         reservations:
           cpus: "0.2"
           memory: 128M
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # ─── Gotenberg PDF Conversion Engine ─────────────────────────────────────
+  gotenberg:
+    image: gotenberg/gotenberg:8.17
+    container_name: spotq-gotenberg
+    restart: unless-stopped
+    shm_size: 256m
+
+    environment:
+      - API_PORT=3008
+      - CHROMIUM_AUTO_START=true
+      - CHROMIUM_RESTART_AFTER=100
+      - LIBREOFFICE_DISABLE_ROUTES=true
+
+    ports:
+      - "127.0.0.1:3008:3008"
+
+    networks:
+      - spotq-backend
+
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:3008/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
 
     logging:
       driver: json-file

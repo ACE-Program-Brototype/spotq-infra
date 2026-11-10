@@ -29,8 +29,8 @@ services:
         condition: service_healthy
       queue-service:
         condition: service_healthy
-      ml-eta-service:
-        condition: service_healthy
+      # ml-eta-service:
+      #   condition: service_healthy
 
     healthcheck:
       test: [ "CMD-SHELL", "wget -qO- http://localhost:10000/healthz || curl -fsS http://localhost:10000/healthz || exit 1" ]
@@ -277,48 +277,48 @@ services:
         max-file: "5"
 
 
-  ml-eta-service:
-    build:
-      context: ../spotq-ml-eta-service
-      dockerfile: Dockerfile
+  # ml-eta-service:
+  #   build:
+  #     context: ../spotq-ml-eta-service
+  #     dockerfile: Dockerfile
 
-    container_name: spotq-ml-eta-service
+  #   container_name: spotq-ml-eta-service
 
-    restart: unless-stopped
+  #   restart: unless-stopped
 
-    environment:
-      INFISICAL_TOKEN: ${ETA_INFISICAL_TOKEN}
+  #   environment:
+  #     INFISICAL_TOKEN: ${ETA_INFISICAL_TOKEN}
 
-    networks:
-      - spotq-backend
+  #   networks:
+  #     - spotq-backend
 
-    depends_on:
-      redis:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
 
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO- http://localhost:8000/healthz || curl -fsS http://localhost:8000/healthz || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
+  #   healthcheck:
+  #     test: [ "CMD-SHELL", "wget -qO- http://localhost:8000/healthz || curl -fsS http://localhost:8000/healthz || exit 1" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 20s
 
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 1024M
-        reservations:
-          cpus: "0.5"
-          memory: 256M
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "2.0"
+  #         memory: 1024M
+  #       reservations:
+  #         cpus: "0.5"
+  #         memory: 256M
 
-    logging:
-      driver: json-file
-      options:
-        max-size: "20m"
-        max-file: "5"
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "20m"
+  #       max-file: "5"
 
   redis:
     image: redis:7-alpine
@@ -402,15 +402,19 @@ services:
 
   # ─── Gotenberg PDF Conversion Engine ─────────────────────────────────────
   gotenberg:
-    image: gotenberg/gotenberg:8
+    image: gotenberg/gotenberg:8.17
     container_name: spotq-gotenberg
     restart: unless-stopped
+    shm_size: 256m
 
     environment:
       - API_PORT=3008
+      - CHROMIUM_AUTO_START=true
+      - CHROMIUM_RESTART_AFTER=100
+      - LIBREOFFICE_DISABLE_ROUTES=true
 
     ports:
-      - "3008:3008"
+      - "127.0.0.1:3008:3008"
 
     networks:
       - spotq-backend
@@ -426,10 +430,10 @@ services:
       resources:
         limits:
           cpus: "1.0"
-          memory: 512M
+          memory: 1024M
         reservations:
           cpus: "0.2"
-          memory: 128M
+          memory: 256M
 
     logging:
       driver: json-file

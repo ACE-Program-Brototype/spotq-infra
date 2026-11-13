@@ -10,7 +10,7 @@ import { getAuthHeaders } from '../helpers/auth.js';
  */
 export function runDashboardStress(token) {
   const headers = getAuthHeaders(token);
-  const periods = ['day', 'week', 'month', 'year'];
+  const periods = ['DAY', 'WEEK', 'MONTH', 'YEAR'];
   const cycles = ['ALL', 'MONTHLY', 'YEARLY'];
 
   const period = periods[Math.floor(Math.random() * periods.length)];

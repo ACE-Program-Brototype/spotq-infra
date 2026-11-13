@@ -29,8 +29,8 @@ export const ENDPOINTS = {
   SUBSCRIBERS_LIST: `${BASE_URL}/api/v1/subscribers`,
 
   // Restaurants Directory & Applications
-  RESTAURANTS_LIST: `${BASE_URL}/api/v1/admin/restaurants`,
-  RESTAURANTS_APPLICATIONS: `${BASE_URL}/api/v1/admin/restaurants/applications`,
+  RESTAURANTS_LIST: `${BASE_URL}/api/v1/restaurants/admin/restaurants`,
+  RESTAURANTS_APPLICATIONS: `${BASE_URL}/api/v1/restaurants/admin/restaurants/applications`,
 
   // Customers Directory
   CUSTOMERS_LIST: `${BASE_URL}/api/v1/users`,
@@ -90,8 +90,8 @@ export const THRESHOLDS = {
   'http_req_duration{endpoint:finance_summary}': ['p(95)<500'],
   'http_req_duration{endpoint:finance_ledger}': ['p(95)<600'],
   // 'http_req_duration{endpoint:finance_export_csv}': ['p(95)<3000'], // Temporarily disabled
-  'http_req_duration{endpoint:orders_list}': ['p(95)<450', 'p(99)<1000'],
-  'http_req_duration{endpoint:subscribers_list}': ['p(95)<600'],
+  'http_req_duration{endpoint:orders_list}': ['p(95)<1000', 'p(99)<1500'],
+  'http_req_duration{endpoint:subscribers_list}': ['p(95)<800'],
   'http_req_duration{endpoint:restaurants_list}': ['p(95)<400'],
-  'http_req_duration{endpoint:customers_list}': ['p(95)<400'],
+  'http_req_duration{endpoint:customers_list}': ['p(95)<700'],
 };

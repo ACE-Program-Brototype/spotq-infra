@@ -12,7 +12,7 @@ export function runAdminWorkflow(token) {
 
   group('01_Platform_Executive_Dashboard', () => {
     // 1. Load consolidated analytics dashboard (fan-out across payment & user services)
-    const url = `${ENDPOINTS.DASHBOARD_ANALYTICS}?period=month&billingCycle=ALL`;
+    const url = `${ENDPOINTS.DASHBOARD_ANALYTICS}?period=MONTH&billingCycle=ALL`;
     const res = http.get(url, {
       ...headers,
       tags: { endpoint: 'dashboard_analytics' },

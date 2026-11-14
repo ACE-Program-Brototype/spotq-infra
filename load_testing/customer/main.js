@@ -152,6 +152,10 @@ export default function (data) {
       runPaymentsSuite(token);
       break;
 
+    case 'health':
+      runHealthSuite();
+      break;
+
     case 'journey':
       runCustomerJourney(token, seedData);
       break;

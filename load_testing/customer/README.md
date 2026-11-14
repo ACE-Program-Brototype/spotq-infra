@@ -38,20 +38,26 @@ This suite is modeled around real-world diner behavior, rush-hour peak ordering 
 | **1** | `POST` | `/api/v1/auth/users/login` | Authenticate customer credentials & issue JWT Bearer tokens |
 | **2** | `POST` | `/api/v1/auth/users/refresh-token` | Silent token renewal using HTTP cookies / refresh token |
 | **3** | `POST` | `/api/v1/auth/users/register` | Customer sign-up & account provisioning |
-| **4** | `POST` | `/api/v1/auth/users/resend-email-otp` | Reissue email verification OTP |
-| **5** | `POST` | `/api/v1/auth/users/forgot-password` | Initiate password reset flow & send OTP |
-| **6** | `POST` | `/api/v1/auth/users/forgot-password/resend-otp` | Reissue forgot password OTP |
-| **7** | `POST` | `/api/v1/auth/users/logout` | Invalidate customer session & clear cookies |
+| **4** | `POST` | `/api/v1/auth/users/verify-email` | Verify customer registration email via 6-digit OTP |
+| **5** | `POST` | `/api/v1/auth/users/resend-email-otp` | Reissue email verification OTP |
+| **6** | `POST` | `/api/v1/auth/users/email-verification/resend` | Secondary route for reissuing verification OTP |
+| **7** | `POST` | `/api/v1/auth/users/oauth/google` | Google OAuth identity verification & exchange |
+| **8** | `POST` | `/api/v1/auth/users/forgot-password` | Initiate password reset flow & send OTP |
+| **9** | `POST` | `/api/v1/auth/users/forgot-password/resend-otp` | Reissue forgot password OTP |
+| **10** | `POST` | `/api/v1/auth/users/forgot-password/verify` | Validate 6-digit OTP for password recovery |
+| **11** | `POST` | `/api/v1/auth/users/reset-password` | Set new password with temporary verification token |
+| **12** | `POST` | `/api/v1/auth/users/logout` | Invalidate customer session & clear cookies |
 
-### 2. Customer Profile & Device Tokens (`user-service`)
+### 2. Customer Profile, Storage & Devices (`user-service` / `restaurant-service`)
 | # | Method | Endpoint | Description |
 | :-: | :-: | :--- | :--- |
-| **8** | `GET` | `/api/v1/users/profile` | Retrieve customer profile (name, phone, dob, gender) |
-| **9** | `PATCH` | `/api/v1/users/profile` | Update profile information with validation rules |
-| **10** | `GET` | `/api/v1/users/me` | Fetch active session customer identity snapshot |
-| **11** | `GET` | `/api/v1/users/me/devices` | List registered customer push notification devices |
-| **12** | `POST` | `/api/v1/users/me/devices` | Register web/mobile push notification device token |
-| **13** | `DELETE` | `/api/v1/users/me/devices/:deviceId` | Deactivate/revoke push notification device |
+| **13** | `GET` | `/api/v1/users/profile` | Retrieve customer profile (name, phone, dob, gender) |
+| **14** | `PATCH` | `/api/v1/users/profile` | Update profile information (name, gender, ISO dob) |
+| **15** | `GET` | `/api/v1/users/me` | Fetch active session customer identity snapshot |
+| **16** | `POST` | `/api/v1/storage/presigned-url` | Generate S3 presigned upload URL for customer profile avatar |
+| **17** | `GET` | `/api/v1/users/me/devices` | List registered customer push notification devices |
+| **18** | `POST` | `/api/v1/users/me/devices` | Register web/mobile push notification device token |
+| **19** | `DELETE` | `/api/v1/users/me/devices/:deviceId` | Deactivate/revoke push notification device |
 
 ### 3. Restaurant Discovery & Menu Catalog (`restaurant-service`)
 | # | Method | Endpoint | Description |

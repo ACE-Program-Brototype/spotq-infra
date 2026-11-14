@@ -27,16 +27,19 @@ export const ENDPOINTS = {
   REGISTER: `${BASE_URL}/api/v1/auth/users/register`,
   VERIFY_EMAIL: `${BASE_URL}/api/v1/auth/users/verify-email`,
   RESEND_EMAIL_OTP: `${BASE_URL}/api/v1/auth/users/resend-email-otp`,
+  EMAIL_VERIFICATION_RESEND: `${BASE_URL}/api/v1/auth/users/email-verification/resend`,
   FORGOT_PASSWORD: `${BASE_URL}/api/v1/auth/users/forgot-password`,
   FORGOT_PASSWORD_VERIFY: `${BASE_URL}/api/v1/auth/users/forgot-password/verify`,
   FORGOT_PASSWORD_RESEND_OTP: `${BASE_URL}/api/v1/auth/users/forgot-password/resend-otp`,
   RESET_PASSWORD: `${BASE_URL}/api/v1/auth/users/reset-password`,
+  GOOGLE_OAUTH: `${BASE_URL}/api/v1/auth/users/oauth/google`,
 
-  // 2. Customer Profile & Devices
+  // 2. Customer Profile & Devices & Storage
   PROFILE: `${BASE_URL}/api/v1/users/profile`,
   ME: `${BASE_URL}/api/v1/users/me`,
   DEVICES: `${BASE_URL}/api/v1/users/me/devices`,
   DEVICE_BY_ID: (deviceId) => `${BASE_URL}/api/v1/users/me/devices/${encodeURIComponent(deviceId)}`,
+  STORAGE_PRESIGNED_URL: `${BASE_URL}/api/v1/storage/presigned-url`,
 
   // 3. Restaurants Directory & Menu Catalog
   RESTAURANTS_LIST: `${BASE_URL}/api/v1/restaurants/customers`,
@@ -138,11 +141,17 @@ export const THRESHOLDS = {
   'http_req_duration{endpoint:customer_login}': ['p(95)<400'],
   'http_req_duration{endpoint:customer_refresh_token}': ['p(95)<400'],
   'http_req_duration{endpoint:customer_register}': ['p(95)<600'],
+  'http_req_duration{endpoint:customer_verify_email}': ['p(95)<400'],
   'http_req_duration{endpoint:customer_resend_email_otp}': ['p(95)<500'],
+  'http_req_duration{endpoint:customer_google_oauth}': ['p(95)<500'],
   'http_req_duration{endpoint:customer_forgot_password}': ['p(95)<500'],
+  'http_req_duration{endpoint:customer_forgot_password_verify}': ['p(95)<400'],
+  'http_req_duration{endpoint:customer_reset_password}': ['p(95)<450'],
+  'http_req_duration{endpoint:customer_logout}': ['p(95)<300'],
   'http_req_duration{endpoint:customer_profile_get}': ['p(95)<350'],
   'http_req_duration{endpoint:customer_profile_update}': ['p(95)<400'],
   'http_req_duration{endpoint:customer_me}': ['p(95)<350'],
+  'http_req_duration{endpoint:customer_avatar_presigned}': ['p(95)<400'],
   'http_req_duration{endpoint:customer_devices_get}': ['p(95)<350'],
   'http_req_duration{endpoint:customer_devices_register}': ['p(95)<450'],
   'http_req_duration{endpoint:customer_device_delete}': ['p(95)<400'],

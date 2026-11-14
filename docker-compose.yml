@@ -66,6 +66,7 @@ services:
 
     environment:
       INFISICAL_TOKEN: ${USER_INFISICAL_TOKEN}
+      LOCAL_DATABASE_URL: postgresql://spotq_admin:spotq_secret_pass@postgres:5432/spotq_user_db?sslmode=disable
 
     networks:
       - spotq-backend
@@ -74,6 +75,8 @@ services:
       redis:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     
     healthcheck:
@@ -110,6 +113,7 @@ services:
 
     environment:
       INFISICAL_TOKEN: ${RESTAURANT_INFISICAL_TOKEN}
+      LOCAL_DATABASE_URL: postgresql://spotq_admin:spotq_secret_pass@postgres:5432/spotq_restaurant_db?schema=public
 
     networks:
       - spotq-backend
@@ -118,6 +122,8 @@ services:
       redis:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
     
     healthcheck:
@@ -154,6 +160,7 @@ services:
 
     environment:
       INFISICAL_TOKEN: ${ORDER_INFISICAL_TOKEN}
+      LOCAL_DATABASE_URL: postgresql://spotq_admin:spotq_secret_pass@postgres:5432/spotq_order_db?sslmode=disable
 
     networks:
       - spotq-backend
@@ -162,6 +169,8 @@ services:
       redis:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
     healthcheck:
@@ -198,6 +207,7 @@ services:
 
     environment:
       INFISICAL_TOKEN: ${PAYMENT_INFISICAL_TOKEN}
+      LOCAL_DATABASE_URL: postgresql://spotq_admin:spotq_secret_pass@postgres:5432/spotq_payment_db?sslmode=disable
 
     networks:
       - spotq-backend
@@ -206,6 +216,8 @@ services:
       redis:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
       gotenberg:
         condition: service_healthy
@@ -244,6 +256,7 @@ services:
 
     environment:
       INFISICAL_TOKEN: ${QUEUE_INFISICAL_TOKEN}
+      LOCAL_DATABASE_URL: postgresql://spotq_admin:spotq_secret_pass@postgres:5432/spotq_queue_db?sslmode=disable
 
     networks:
       - spotq-backend
@@ -252,6 +265,8 @@ services:
       redis:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
     healthcheck:
@@ -319,6 +334,40 @@ services:
   #     options:
   #       max-size: "20m"
   #       max-file: "5"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: spotq-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: spotq_admin
+      POSTGRES_PASSWORD: spotq_secret_pass
+      POSTGRES_DB: spotq_restaurant_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - spotq-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spotq_admin -d spotq_restaurant_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
 
   redis:
     image: redis:7-alpine
@@ -627,3 +676,5 @@ volumes:
     name: spotq-redis-data
   rabbitmq-data:
     name: spotq-rabbitmq-data
+  postgres-data:
+    name: spotq-postgres-data

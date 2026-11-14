@@ -2,6 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { ENDPOINTS } from '../config.js';
 import { getAuthHeaders } from '../helpers/auth.js';
+import { diagnoseResponse } from '../helpers/request-diagnostics.js';
 
 /**
  * Dedicated Stress Test on Multi-Tenant Orders Search & Filtering
@@ -31,6 +32,7 @@ export function runOrdersSearchStress(token) {
     tags: { endpoint: 'orders_list' },
     timeout: '15s',
   });
+  diagnoseResponse('orders_list', res);
 
   check(res, {
     'orders search returned 200': (r) => r.status === 200,

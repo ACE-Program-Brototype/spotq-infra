@@ -22,7 +22,6 @@ export function loginAdmin(email = ADMIN_EMAIL, password = ADMIN_PASSWORD) {
   };
 
   const response = http.post(ENDPOINTS.LOGIN, payload, params);
-
   const isSuccess = check(response, {
     'admin login status is 200': (r) => r.status === 200,
     'admin login returned access_token': (r) => {
@@ -38,9 +37,10 @@ export function loginAdmin(email = ADMIN_EMAIL, password = ADMIN_PASSWORD) {
       }
     },
   });
+  console.log(response.message,123332)
 
   if (!isSuccess) {
-    console.error(`Admin login failed! HTTP ${response.status}: ${response.body}`);
+    console.error(`Admin dlogin failed! HTTP ${response.status}: ${response.body}`);
     throw new Error(`Platform Admin login failed with status ${response.status}`);
   }
 

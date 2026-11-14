@@ -56,8 +56,8 @@ export const PROFILES = {
     executor: 'ramping-vus',
     startVUs: 1,
     stages: [
-      { duration: '15s', target: 3 },
-      { duration: '45s', target: 8 }, // Scaled concurrency (team of 5-8 admins)
+      { duration: '15s', target: 10 },
+      { duration: '45s', target: 30 }, // Peak concurrency for stress testing
       { duration: '15s', target: 0 },
     ],
   },

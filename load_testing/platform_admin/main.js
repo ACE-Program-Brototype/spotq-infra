@@ -1,6 +1,7 @@
 import { PROFILES, THRESHOLDS, TEST_PROFILE } from './config.js';
 import { loginAdmin } from './helpers/auth.js';
 import { generateHtmlReport } from './helpers/summary-reporter.js';
+import { getRecordedResponses } from './helpers/response-recorder.js';
 import { runAdminWorkflow } from './tests/admin_workflow.js';
 import { runDashboardStress } from './tests/dashboard_stress.js';
 // import { runCsvExportStress } from './tests/csv_export_stress.js'; // Temporarily disabled
@@ -77,6 +78,7 @@ export function teardown(data) {
  * Generates structured HTML and JSON reports upon completion.
  */
 export function handleSummary(data) {
+  data.requestResponses = getRecordedResponses();
   return {
     'load-test-report.html': generateHtmlReport(data),
     'load-test-summary.json': JSON.stringify(data, null, 2),

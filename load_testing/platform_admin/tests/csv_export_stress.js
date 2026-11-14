@@ -2,6 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { ENDPOINTS } from '../config.js';
 import { getAuthHeaders } from '../helpers/auth.js';
+import { diagnoseResponse } from '../helpers/request-diagnostics.js';
 
 /**
  * Dedicated Stress Test on Master Financial Ledger CSV Export
@@ -18,6 +19,7 @@ export function runCsvExportStress(token) {
     tags: { endpoint: 'finance_export_csv' },
     timeout: '30s', // Export queries may take longer under heavy concurrent table scans
   });
+  diagnoseResponse('finance_export_csv', res);
 
   check(res, {
     'csv export returned 200': (r) => r.status === 200,

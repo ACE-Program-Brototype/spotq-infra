@@ -9,6 +9,13 @@ export function generateHtmlReport(data) {
   const httpFailed = metrics.http_req_failed ? metrics.http_req_failed.values : {};
   const totalRequests = metrics.http_reqs ? metrics.http_reqs.values.count : 0;
   const vusMax = metrics.vus_max ? metrics.vus_max.values.max : (metrics.vus ? metrics.vus.values.max : 0);
+  const responseGroups = data.requestResponses || {};
+  const responseRows = Object.entries(responseGroups).flatMap(([endpoint, responses]) =>
+    responses.map((response, index) => ({ endpoint, index: index + 1, ...response }))
+  );
+  const escapeHtml = (value) => String(value ?? '').replace(/[&<>\"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;',
+  })[char]);
 
   // Extract per-endpoint metrics
   const endpointRows = [];
@@ -42,6 +49,14 @@ export function generateHtmlReport(data) {
     `
     )
     .join('');
+
+  const responseHtml = responseRows.map((response) => `
+    <tr>
+      <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: monospace;">${escapeHtml(response.endpoint)} #${response.index}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${escapeHtml(response.status)} ${escapeHtml(response.statusText)}<br>${escapeHtml(response.durationMs ?? 'N/A')} ms</td>
+      <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-family: monospace; word-break: break-all;">${escapeHtml(response.url)}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><pre style="white-space: pre-wrap; max-width: 600px; max-height: 240px; overflow: auto; margin: 0;">${escapeHtml(response.body)}</pre></td>
+    </tr>`).join('');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -105,6 +120,12 @@ export function generateHtmlReport(data) {
       <tbody>
         ${rowsHtml.length > 0 ? rowsHtml : '<tr><td colspan="6" style="padding: 16px; text-align: center; color: #94a3b8;">No endpoint tags captured</td></tr>'}
       </tbody>
+    </table>
+
+    <h2 style="font-size: 18px; margin-top: 32px; color: #334155;">Request Responses (up to 20 per endpoint)</h2>
+    <table>
+      <thead><tr><th>Request</th><th>Status / Duration</th><th>URL</th><th>Response Body (up to 1 KB)</th></tr></thead>
+      <tbody>${responseHtml || '<tr><td colspan="4" style="padding: 16px; text-align: center; color: #94a3b8;">No request responses recorded</td></tr>'}</tbody>
     </table>
 
     <div class="footer">

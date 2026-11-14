@@ -2,6 +2,7 @@ import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 import { ENDPOINTS } from '../config.js';
 import { getAuthHeaders } from '../helpers/auth.js';
+import { diagnoseResponse } from '../helpers/request-diagnostics.js';
 
 /**
  * Simulates a realistic Platform Administrator session journey across SpotQ.
@@ -17,6 +18,7 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'dashboard_analytics' },
     });
+    diagnoseResponse('dashboard_analytics', res);
 
     check(res, {
       'dashboard analytics returned 200': (r) => r.status === 200,
@@ -39,14 +41,11 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'finance_summary' },
     });
+    diagnoseResponse('finance_summary', summaryRes);
 
     check(summaryRes, {
       'finance summary returned 200': (r) => r.status === 200,
     });
-    if (summaryRes.status !== 200) {
-      console.warn(`[finance_summary] HTTP ${summaryRes.status}: ${summaryRes.body ? summaryRes.body.slice(0, 150) : ''}`);
-    }
-
     sleep(0.5);
 
     // 3. Browse financial master ledger entries with pagination
@@ -55,14 +54,11 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'finance_ledger' },
     });
+    diagnoseResponse('finance_ledger', ledgerRes);
 
     check(ledgerRes, {
       'finance ledger returned 200': (r) => r.status === 200,
     });
-    if (ledgerRes.status !== 200) {
-      console.warn(`[finance_ledger] HTTP ${ledgerRes.status}: ${ledgerRes.body ? ledgerRes.body.slice(0, 150) : ''}`);
-    }
-
     sleep(Math.random() * 2 + 1);
   });
 
@@ -79,6 +75,7 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'orders_list' },
     });
+    diagnoseResponse('orders_list', ordersRes);
 
     check(ordersRes, {
       'orders list returned 200': (r) => r.status === 200,
@@ -91,10 +88,6 @@ export function runAdminWorkflow(token) {
         }
       },
     });
-    if (ordersRes.status !== 200) {
-      console.warn(`[orders_list] HTTP ${ordersRes.status}: ${ordersRes.body ? ordersRes.body.slice(0, 150) : ''}`);
-    }
-
     sleep(Math.random() * 2 + 1);
   });
 
@@ -105,14 +98,11 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'subscribers_list' },
     });
+    diagnoseResponse('subscribers_list', subsRes);
 
     check(subsRes, {
       'subscribers list returned 200': (r) => r.status === 200,
     });
-    if (subsRes.status !== 200) {
-      console.warn(`[subscribers_list] HTTP ${subsRes.status}: ${subsRes.body ? subsRes.body.slice(0, 150) : ''}`);
-    }
-
     sleep(Math.random() * 1.5 + 0.5);
   });
 
@@ -123,6 +113,7 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'restaurants_list' },
     });
+    diagnoseResponse('restaurants_list', restRes);
 
     check(restRes, {
       'restaurants directory returned 200': (r) => r.status === 200,
@@ -136,6 +127,7 @@ export function runAdminWorkflow(token) {
       ...headers,
       tags: { endpoint: 'customers_list' },
     });
+    diagnoseResponse('customers_list', custRes);
 
     check(custRes, {
       'customers directory returned 200': (r) => r.status === 200,

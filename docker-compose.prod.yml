@@ -50,8 +50,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: api-gateway
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Microservice: User Service ─────────────────────────────────────────
   user-service:
@@ -92,8 +92,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: user-service
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Microservice: Restaurant Service ───────────────────────────────────
   restaurant-service:
@@ -134,8 +134,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: restaurant-service
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Microservice: Order Service ────────────────────────────────────────
   order-service:
@@ -176,8 +176,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: order-service
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Microservice: Payment Service ──────────────────────────────────────
   payment-service:
@@ -220,8 +220,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: payment-service
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Microservice: Queue Service ────────────────────────────────────────
   queue-service:
@@ -262,8 +262,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: queue-service
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Microservice: ML / ETA Service ─────────────────────────────────────
   ml-eta-service:
@@ -304,8 +304,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: ml-eta-service
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Datastore: Redis ───────────────────────────────────────────────────
   redis:
@@ -342,8 +342,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: redis
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── Message Broker: RabbitMQ ───────────────────────────────────────────
   rabbitmq:
@@ -386,8 +386,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: rabbitmq
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
   # ─── PDF Engine: Gotenberg ──────────────────────────────────────────────
   gotenberg:
@@ -426,8 +426,8 @@ services:
       options:
         awslogs-region: ${AWS_REGION}
         awslogs-group: ${AWS_LOG_GROUP}
-        awslogs-stream-prefix: gotenberg
         awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
 
 # ─── Networks ─────────────────────────────────────────────────────────────
 networks:

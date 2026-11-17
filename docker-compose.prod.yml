@@ -46,10 +46,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: api-gateway
+        awslogs-create-group: "true"
 
   # ─── Microservice: User Service ─────────────────────────────────────────
   user-service:
@@ -86,10 +88,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: user-service
+        awslogs-create-group: "true"
 
   # ─── Microservice: Restaurant Service ───────────────────────────────────
   restaurant-service:
@@ -126,10 +130,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: restaurant-service
+        awslogs-create-group: "true"
 
   # ─── Microservice: Order Service ────────────────────────────────────────
   order-service:
@@ -166,10 +172,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: order-service
+        awslogs-create-group: "true"
 
   # ─── Microservice: Payment Service ──────────────────────────────────────
   payment-service:
@@ -208,10 +216,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: payment-service
+        awslogs-create-group: "true"
 
   # ─── Microservice: Queue Service ────────────────────────────────────────
   queue-service:
@@ -248,10 +258,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: queue-service
+        awslogs-create-group: "true"
 
   # ─── Microservice: ML / ETA Service ─────────────────────────────────────
   ml-eta-service:
@@ -288,10 +300,12 @@ services:
           memory: 256M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: ml-eta-service
+        awslogs-create-group: "true"
 
   # ─── Datastore: Redis ───────────────────────────────────────────────────
   redis:
@@ -324,10 +338,12 @@ services:
           memory: 64M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: redis
+        awslogs-create-group: "true"
 
   # ─── Message Broker: RabbitMQ ───────────────────────────────────────────
   rabbitmq:
@@ -366,10 +382,12 @@ services:
           memory: 128M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: rabbitmq
+        awslogs-create-group: "true"
 
   # ─── PDF Engine: Gotenberg ──────────────────────────────────────────────
   gotenberg:
@@ -404,10 +422,12 @@ services:
           memory: 256M
 
     logging:
-      driver: json-file
+      driver: awslogs
       options:
-        max-size: "20m"
-        max-file: "5"
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-stream-prefix: gotenberg
+        awslogs-create-group: "true"
 
 # ─── Networks ─────────────────────────────────────────────────────────────
 networks:

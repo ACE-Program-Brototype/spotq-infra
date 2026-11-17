@@ -66,8 +66,26 @@ variable "infisical_token" {
   default     = ""
 }
 
-variable "log_retention_days" {
-  description = "Number of days to retain CloudWatch logs"
+variable "ec2_log_retention_days" {
+  description = "Number of days to retain EC2 OS/system logs in CloudWatch"
+  type        = number
+  default     = 90
+}
+
+variable "microservices_log_retention_days" {
+  description = "Number of days to retain microservices container logs in CloudWatch"
   type        = number
   default     = 14
+}
+
+variable "alarm_actions" {
+  description = "List of ARNs (e.g. SNS topic) to notify when alarm triggers"
+  type        = list(string)
+  default     = []
+}
+
+variable "alert_email" {
+  description = "Email address to receive CloudWatch alarm notifications (set via Infisical TF_VAR_alert_email)"
+  type        = string
+  default     = ""
 }

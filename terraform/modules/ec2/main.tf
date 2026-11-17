@@ -26,8 +26,9 @@ resource "aws_instance" "server" {
   user_data = templatefile("${path.module}/userdata.sh", {
     cloudflare_tunnel_token = var.cloudflare_tunnel_token
     infisical_token         = var.infisical_token
+    ec2_log_group_name      = var.ec2_log_group_name
   })
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
 
   root_block_device {
     volume_size           = 40

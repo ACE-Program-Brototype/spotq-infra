@@ -28,10 +28,23 @@ module "iam" {
 module "ec2" {
   source = "../../modules/ec2"
 
-  instance_name         = "${local.resource_prefix}-ec2"
-  instance_type         = var.instance_type
-  key_name              = var.key_name
-  security_group_id     = module.security.security_group_id
-  instance_profile_name = module.iam.instance_profile_name
-  tags                  = local.common_tags
+  instance_name           = "${local.resource_prefix}-ec2"
+  instance_type           = var.instance_type
+  instance_state          = var.instance_state
+  key_name                = var.key_name
+  security_group_id       = module.security.security_group_id
+  instance_profile_name   = module.iam.instance_profile_name
+  cloudflare_tunnel_token = var.cloudflare_tunnel_token
+  infisical_token         = var.infisical_token
+  tags                    = local.common_tags
+}
+
+module "cloudwatch" {
+  source            = "../../modules/cloudwatch"
+  log_group_name    = "/${var.project_name}/${var.environment}/ec2"
+  retention_in_days = var.log_retention_days
+  instance_id       = module.ec2.instance_id
+  project_name      = var.project_name
+  environment       = var.environment
+  tags              = local.common_tags
 }

@@ -20,6 +20,12 @@ variable "app_port" {
   default     = 10000
 }
 
+variable "enable_public_web_ingress" {
+  description = "Enable direct public web ingress (80/443/app_port). Set to false when using Cloudflare Tunnel."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Resource tags"
   type        = map(string)

@@ -53,3 +53,18 @@ output "iam_instance_profile_name" {
   value       = module.iam.instance_profile_name
 }
 
+output "cloudwatch_log_group_name" {
+  description = "Name of the CloudWatch Log Group for application/system logs"
+  value       = module.cloudwatch.log_group_name
+}
+
+output "cloudwatch_high_cpu_alarm_arn" {
+  description = "ARN of the CloudWatch CPU utilization alarm"
+  value       = module.cloudwatch.high_cpu_alarm_arn
+}
+
+output "cloudwatch_status_check_alarm_arn" {
+  description = "ARN of the CloudWatch instance status check alarm"
+  value       = module.cloudwatch.status_check_alarm_arn
+}
+

@@ -22,6 +22,7 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "http" {
+  count             = var.enable_public_web_ingress ? 1 : 0
   security_group_id = aws_security_group.spotq_sg.id
   description       = "HTTP access"
   cidr_ipv4         = "0.0.0.0/0"
@@ -33,6 +34,7 @@ resource "aws_vpc_security_group_ingress_rule" "http" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "https" {
+  count             = var.enable_public_web_ingress ? 1 : 0
   security_group_id = aws_security_group.spotq_sg.id
   description       = "HTTPS access"
   cidr_ipv4         = "0.0.0.0/0"
@@ -44,6 +46,7 @@ resource "aws_vpc_security_group_ingress_rule" "https" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "app_gateway" {
+  count             = var.enable_public_web_ingress ? 1 : 0
   security_group_id = aws_security_group.spotq_sg.id
   description       = "API Gateway application ingress"
   cidr_ipv4         = "0.0.0.0/0"

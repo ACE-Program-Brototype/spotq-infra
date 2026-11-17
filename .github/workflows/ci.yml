@@ -42,5 +42,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Validate Docker Compose Configuration
-        run: docker compose --env-file .env.example config -q
+      - name: Validate Docker Compose Configurations
+        run: |
+          docker compose --env-file .env.example config -q
+          docker compose --env-file deploy/images.lock.env --env-file .env.example -f docker-compose.prod.yml config -q

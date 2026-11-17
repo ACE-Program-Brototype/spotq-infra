@@ -40,7 +40,7 @@ module "ec2" {
 }
 
 module "cloudwatch" {
-  source = "../../modules/cloudwatch"
+  source            = "../../modules/cloudwatch"
   log_group_name    = "/${var.project_name}/${var.environment}/ec2"
   retention_in_days = var.log_retention_days
   instance_id       = module.ec2.instance_id

@@ -1,7 +1,30 @@
 resource "aws_cloudwatch_log_group" "app_logs" {
   name              = var.log_group_name
-  retention_in_days = var.retention_in_days
+  retention_in_days = var.ec2_log_retention_days
   tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "microservices_logs" {
+  name              = "/${var.project_name}/${var.environment}/microservices"
+  retention_in_days = var.microservices_log_retention_days
+  tags              = var.tags
+}
+
+# --- SNS Alerting ---
+resource "aws_sns_topic" "alerts" {
+  name = "${var.project_name}-${var.environment}-alerts"
+  tags = var.tags
+}
+
+resource "aws_sns_topic_subscription" "email" {
+  count     = var.alert_email != "" ? 1 : 0
+  topic_arn = aws_sns_topic.alerts.arn
+  protocol  = "email"
+  endpoint  = var.alert_email
+}
+
+locals {
+  all_alarm_actions = concat([aws_sns_topic.alerts.arn], var.alarm_actions)
 }
 
 resource "aws_cloudwatch_metric_alarm" "high_cpu" {
@@ -15,6 +38,8 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   threshold           = 80
   alarm_description   = "Triggered when EC2 CPU utilization exceeds 80% for 10 consecutive minutes"
   treat_missing_data  = "missing"
+  alarm_actions       = local.all_alarm_actions
+  ok_actions          = local.all_alarm_actions
 
   dimensions = {
     InstanceId = var.instance_id
@@ -34,9 +59,54 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed" {
   threshold           = 1
   alarm_description   = "Triggered when EC2 instance or system status check fails"
   treat_missing_data  = "breaching"
+  alarm_actions       = local.all_alarm_actions
+  ok_actions          = local.all_alarm_actions
 
   dimensions = {
     InstanceId = var.instance_id
+  }
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "high_memory" {
+  alarm_name          = "${var.project_name}-${var.environment}-high-memory"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "mem_used_percent"
+  namespace           = "CWAgent"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 85
+  alarm_description   = "Triggered when EC2 memory utilization exceeds 85% for 10 consecutive minutes"
+  treat_missing_data  = "missing"
+  alarm_actions       = local.all_alarm_actions
+  ok_actions          = local.all_alarm_actions
+
+  dimensions = {
+    InstanceId = var.instance_id
+  }
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "high_disk" {
+  alarm_name          = "${var.project_name}-${var.environment}-high-disk"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2
+  metric_name         = "disk_used_percent"
+  namespace           = "CWAgent"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 85
+  alarm_description   = "Triggered when EC2 root filesystem utilization exceeds 85% for 10 consecutive minutes"
+  treat_missing_data  = "missing"
+  alarm_actions       = local.all_alarm_actions
+  ok_actions          = local.all_alarm_actions
+
+  dimensions = {
+    InstanceId = var.instance_id
+    path       = "/"
   }
 
   tags = var.tags

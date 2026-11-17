@@ -54,8 +54,18 @@ output "iam_instance_profile_name" {
 }
 
 output "cloudwatch_log_group_name" {
-  description = "Name of the CloudWatch Log Group for application/system logs"
+  description = "Name of the CloudWatch Log Group for system/EC2 logs"
   value       = module.cloudwatch.log_group_name
+}
+
+output "cloudwatch_microservices_log_group_name" {
+  description = "Name of the CloudWatch Log Group for microservices container logs"
+  value       = module.cloudwatch.microservices_log_group_name
+}
+
+output "cloudwatch_microservices_log_group_arn" {
+  description = "ARN of the CloudWatch Log Group for microservices container logs"
+  value       = module.cloudwatch.microservices_log_group_arn
 }
 
 output "cloudwatch_high_cpu_alarm_arn" {
@@ -66,5 +76,20 @@ output "cloudwatch_high_cpu_alarm_arn" {
 output "cloudwatch_status_check_alarm_arn" {
   description = "ARN of the CloudWatch instance status check alarm"
   value       = module.cloudwatch.status_check_alarm_arn
+}
+
+output "cloudwatch_high_memory_alarm_arn" {
+  description = "ARN of the CloudWatch memory utilization alarm"
+  value       = module.cloudwatch.high_memory_alarm_arn
+}
+
+output "cloudwatch_high_disk_alarm_arn" {
+  description = "ARN of the CloudWatch disk utilization alarm"
+  value       = module.cloudwatch.high_disk_alarm_arn
+}
+
+output "cloudwatch_sns_topic_arn" {
+  description = "ARN of the SNS topic for alarm notifications"
+  value       = module.cloudwatch.sns_topic_arn
 }
 

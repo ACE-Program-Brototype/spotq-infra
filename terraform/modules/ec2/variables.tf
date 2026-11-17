@@ -39,6 +39,12 @@ variable "infisical_token" {
   default     = ""
 }
 
+variable "ec2_log_group_name" {
+  description = "CloudWatch log group name for EC2 system logs"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   type = map(string)
 }

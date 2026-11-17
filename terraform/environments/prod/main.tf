@@ -36,15 +36,19 @@ module "ec2" {
   instance_profile_name   = module.iam.instance_profile_name
   cloudflare_tunnel_token = var.cloudflare_tunnel_token
   infisical_token         = var.infisical_token
+  ec2_log_group_name      = "/${var.project_name}/${var.environment}/ec2"
   tags                    = local.common_tags
 }
 
 module "cloudwatch" {
-  source            = "../../modules/cloudwatch"
-  log_group_name    = "/${var.project_name}/${var.environment}/ec2"
-  retention_in_days = var.log_retention_days
-  instance_id       = module.ec2.instance_id
-  project_name      = var.project_name
-  environment       = var.environment
-  tags              = local.common_tags
+  source                           = "../../modules/cloudwatch"
+  log_group_name                   = "/${var.project_name}/${var.environment}/ec2"
+  ec2_log_retention_days           = var.ec2_log_retention_days
+  microservices_log_retention_days = var.microservices_log_retention_days
+  instance_id                      = module.ec2.instance_id
+  project_name                     = var.project_name
+  environment                      = var.environment
+  alarm_actions                    = var.alarm_actions
+  alert_email                      = var.alert_email
+  tags                             = local.common_tags
 }

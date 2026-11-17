@@ -40,6 +40,13 @@ module "ec2" {
   tags                    = local.common_tags
 }
 
+module "sns" {
+  source      = "../../modules/sns"
+  topic_name  = "${var.project_name}-${var.environment}-alerts"
+  alert_email = var.alert_email
+  tags        = local.common_tags
+}
+
 module "cloudwatch" {
   source                           = "../../modules/cloudwatch"
   log_group_name                   = "/${var.project_name}/${var.environment}/ec2"
@@ -48,7 +55,6 @@ module "cloudwatch" {
   instance_id                      = module.ec2.instance_id
   project_name                     = var.project_name
   environment                      = var.environment
-  alarm_actions                    = var.alarm_actions
-  alert_email                      = var.alert_email
+  alarm_actions                    = concat([module.sns.topic_arn], var.alarm_actions)
   tags                             = local.common_tags
 }

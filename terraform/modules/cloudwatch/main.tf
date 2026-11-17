@@ -10,23 +10,6 @@ resource "aws_cloudwatch_log_group" "microservices_logs" {
   tags              = var.tags
 }
 
-# --- SNS Alerting ---
-resource "aws_sns_topic" "alerts" {
-  name = "${var.project_name}-${var.environment}-alerts"
-  tags = var.tags
-}
-
-resource "aws_sns_topic_subscription" "email" {
-  count     = var.alert_email != "" ? 1 : 0
-  topic_arn = aws_sns_topic.alerts.arn
-  protocol  = "email"
-  endpoint  = var.alert_email
-}
-
-locals {
-  all_alarm_actions = concat([aws_sns_topic.alerts.arn], var.alarm_actions)
-}
-
 resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   alarm_name          = "${var.project_name}-${var.environment}-high-cpu"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -38,8 +21,8 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   threshold           = 80
   alarm_description   = "Triggered when EC2 CPU utilization exceeds 80% for 10 consecutive minutes"
   treat_missing_data  = "missing"
-  alarm_actions       = local.all_alarm_actions
-  ok_actions          = local.all_alarm_actions
+  alarm_actions       = var.alarm_actions
+  ok_actions          = var.alarm_actions
 
   dimensions = {
     InstanceId = var.instance_id
@@ -59,8 +42,8 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed" {
   threshold           = 1
   alarm_description   = "Triggered when EC2 instance or system status check fails"
   treat_missing_data  = "breaching"
-  alarm_actions       = local.all_alarm_actions
-  ok_actions          = local.all_alarm_actions
+  alarm_actions       = var.alarm_actions
+  ok_actions          = var.alarm_actions
 
   dimensions = {
     InstanceId = var.instance_id
@@ -80,8 +63,8 @@ resource "aws_cloudwatch_metric_alarm" "high_memory" {
   threshold           = 85
   alarm_description   = "Triggered when EC2 memory utilization exceeds 85% for 10 consecutive minutes"
   treat_missing_data  = "missing"
-  alarm_actions       = local.all_alarm_actions
-  ok_actions          = local.all_alarm_actions
+  alarm_actions       = var.alarm_actions
+  ok_actions          = var.alarm_actions
 
   dimensions = {
     InstanceId = var.instance_id
@@ -101,8 +84,8 @@ resource "aws_cloudwatch_metric_alarm" "high_disk" {
   threshold           = 85
   alarm_description   = "Triggered when EC2 root filesystem utilization exceeds 85% for 10 consecutive minutes"
   treat_missing_data  = "missing"
-  alarm_actions       = local.all_alarm_actions
-  ok_actions          = local.all_alarm_actions
+  alarm_actions       = var.alarm_actions
+  ok_actions          = var.alarm_actions
 
   dimensions = {
     InstanceId = var.instance_id

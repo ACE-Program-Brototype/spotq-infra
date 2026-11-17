@@ -40,9 +40,3 @@ variable "alarm_actions" {
   type        = list(string)
   default     = []
 }
-
-variable "alert_email" {
-  description = "Email address to receive CloudWatch alarm notifications via SNS"
-  type        = string
-  default     = ""
-}

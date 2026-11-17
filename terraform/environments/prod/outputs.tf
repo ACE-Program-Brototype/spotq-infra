@@ -90,6 +90,6 @@ output "cloudwatch_high_disk_alarm_arn" {
 
 output "cloudwatch_sns_topic_arn" {
   description = "ARN of the SNS topic for alarm notifications"
-  value       = module.cloudwatch.sns_topic_arn
+  value       = module.sns.topic_arn
 }
 

@@ -1,0 +1,137 @@
+name: Continuous Deployment (EC2)
+
+on:
+  push:
+    branches:
+      - development
+      - main
+    paths:
+      - "deploy/images.lock.env"
+      - "docker-compose.prod.yml"
+      - ".github/workflows/cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infra-deployment-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Platform to EC2
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout spotq-infra
+        uses: actions/checkout@v4
+
+      - name: Validate Lockfile Integrity
+        run: |
+          echo "Validating deploy/images.lock.env..."
+          if [ ! -f "deploy/images.lock.env" ]; then
+            echo "::error::deploy/images.lock.env file not found!"
+            exit 1
+          fi
+
+          # Ensure no empty values for service images
+          EMPTY_KEYS=$(grep -v '^#' deploy/images.lock.env | grep -E '^[^=]+= *$' || true)
+          if [ -n "$EMPTY_KEYS" ]; then
+            echo "::error::Found empty image values in deploy/images.lock.env:"
+            echo "$EMPTY_KEYS"
+            exit 1
+          fi
+
+          # Check for duplicate key definitions
+          DUPLICATES=$(grep -v '^#' deploy/images.lock.env | grep '=' | cut -d'=' -f1 | sort | uniq -d || true)
+          if [ -n "$DUPLICATES" ]; then
+            echo "::error::Duplicate keys found in images.lock.env: $DUPLICATES"
+            exit 1
+          fi
+
+          echo "deploy/images.lock.env validated successfully."
+
+      - name: Deploy to Remote EC2 Instance via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            echo "=========================================================="
+            echo "  Starting SpotQ Platform Deployment on EC2"
+            echo "=========================================================="
+
+            # 1. Navigate to the infrastructure repository on the host
+            cd /home/ec2-user/spotq-infra
+
+            echo "=== [1/6] Checking and synchronizing Git branch ==="
+            TARGET_BRANCH="${{ github.ref_name }}"
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+            echo "Active branch on EC2: '$CURRENT_BRANCH'"
+            echo "Target deployment branch: '$TARGET_BRANCH'"
+
+            # Fetch target branch metadata from remote
+            git fetch origin "$TARGET_BRANCH"
+
+            # Switch branch if EC2 is currently on another branch
+            if [ "$CURRENT_BRANCH" != "$TARGET_BRANCH" ]; then
+              echo "Switching branch from '$CURRENT_BRANCH' to '$TARGET_BRANCH'..."
+              git checkout "$TARGET_BRANCH"
+            fi
+
+            # Clean fast-forward pull from origin (blocks if diverged, zero merge commits)
+            echo "Pulling latest changes for '$TARGET_BRANCH' from origin..."
+            git pull --ff-only origin "$TARGET_BRANCH"
+
+            echo "=== [2/6] Pre-pulling updated container images ==="
+            # Download new layers in the background while active containers keep serving traffic
+            docker compose --env-file deploy/images.lock.env -f docker-compose.prod.yml pull
+
+            echo "=== [3/6] Applying container updates (Zero-Downtime Recompose) ==="
+            # Recreate only containers whose image digest changed
+            if command -v infisical &> /dev/null && [ -n "${INFISICAL_TOKEN:-}" ]; then
+              echo "Starting containers with Infisical secret injection..."
+              infisical run --env=dev -- docker compose --env-file deploy/images.lock.env -f docker-compose.prod.yml up -d --remove-orphans
+            else
+              echo "Starting containers directly with environment configuration..."
+              docker compose --env-file deploy/images.lock.env -f docker-compose.prod.yml up -d --remove-orphans
+            fi
+
+            echo "=== [4/6] Waiting for service health checks ==="
+            sleep 15
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "=== [5/6] Verifying API Gateway ingress probe ==="
+            curl -fsS http://127.0.0.1:10000/healthz || {
+              echo "::error::API Gateway healthcheck probe failed!"
+              docker compose -f docker-compose.prod.yml logs --tail=50 api-gateway
+              exit 1
+            }
+
+            echo "=== [6/6] Pruning orphaned and dangling Docker images ==="
+            docker image prune -f
+
+            echo "=========================================================="
+            echo "  SpotQ Platform Deployment Completed Successfully!"
+            echo "=========================================================="
+
+      - name: Generate Deployment Step Summary
+        if: always()
+        run: |
+          echo "### 🚀 EC2 Platform Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Host:** \`${{ secrets.EC2_HOST }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment Status:** ${{ job.status == 'success' && '✅ Succeeded (Healthy)' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### Active Images Deployed:" >> $GITHUB_STEP_SUMMARY
+          echo '```env' >> $GITHUB_STEP_SUMMARY
+          cat deploy/images.lock.env >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

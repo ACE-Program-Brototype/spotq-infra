@@ -40,3 +40,9 @@ variable "alarm_actions" {
   type        = list(string)
   default     = []
 }
+
+variable "root_volume_id" {
+  description = "EBS Root Volume ID of the EC2 instance for storage IOPS and latency metrics"
+  type        = string
+  default     = ""
+}

@@ -1,0 +1,247 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "# SpotQ Microservices & Application Operations\n*Real-time performance monitoring for API Gateway, microservices, background message queues, and databases.*"
+      }
+    },
+    {
+      "type": "alarm",
+      "x": 0,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Production Alarm Status",
+        "alarms": [
+          "${alarm_cpu}",
+          "${alarm_memory}",
+          "${alarm_disk}",
+          "${alarm_status}"
+        ]
+      }
+    },
+    {
+      "type": "log",
+      "x": 6,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nstats count(*) as requests by @logStream\n| sort requests desc",
+        "region": "${region}",
+        "view": "pie",
+        "title": "Traffic Share by Microservice"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter ispresent(statusCode) or ispresent(method) or @message like /(GET|POST|PUT|DELETE|PATCH)/\n| stats count(*) as requests_per_minute by bin(1m)",
+        "region": "${region}",
+        "view": "timeSeries",
+        "stacked": false,
+        "title": "SpotQ API Requests (per minute)"
+      }
+    },
+    {
+      "type": "log",
+      "x": 18,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter statusCode >= 500 or level = \"ERROR\"\n| stats count(*) as errors_per_minute by bin(1m)",
+        "region": "${region}",
+        "view": "timeSeries",
+        "stacked": false,
+        "title": "SpotQ Server Errors (5xx per minute)"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 8,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter level = \"ERROR\" or statusCode >= 400 or @message like /(?i)error|exception/\n| stats count(*) as error_count by bin(5m)",
+        "region": "${region}",
+        "view": "bar",
+        "title": "Application Error Trend (5xx and 4xx Errors)"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 8,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter ispresent(statusCode)\n| fields case(\n    statusCode >= 500, \"5xx Server Error\",\n    statusCode >= 400, \"4xx Client Error\",\n    statusCode >= 300, \"3xx Redirection\",\n    statusCode >= 200, \"2xx Success\",\n    \"Other\"\n  ) as ResponseCategory\n| stats count(*) as total by ResponseCategory\n| sort total desc",
+        "region": "${region}",
+        "view": "pie",
+        "title": "HTTP Response Status Category (2xx Success vs 4xx vs 5xx)"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 14,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "## Microservices Live Activity Logs\n*Structured log events showing Timestamp, Log Level, Message, HTTP Method, Endpoint URL, and Status Code.*"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 16,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter @logStream like /api-gateway/\n| fields @timestamp,\n       case(response_code >= 500, \"ERROR\", response_code >= 400, \"WARN\", \"INFO\") as level,\n       concat(method, \" \", path) as message,\n       method,\n       path as url,\n       response_code as statusCode\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "API Gateway Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 16,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfields @timestamp, coalesce(level, \"INFO\") as level, coalesce(msg, @message) as message, method, url, statusCode\n| filter @logStream like /user-service/\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "User Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 23,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfields @timestamp, coalesce(level, \"INFO\") as level, coalesce(msg, @message) as message, method, url, statusCode\n| filter @logStream like /restaurant-service/\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "Restaurant Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 23,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfields @timestamp, coalesce(level, \"INFO\") as level, coalesce(msg, @message) as message, method, url, statusCode\n| filter @logStream like /order-service/\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "Order Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 30,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfields @timestamp, coalesce(level, \"INFO\") as level, coalesce(msg, @message) as message, method, url, statusCode\n| filter @logStream like /payment-service/\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "Payment Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 30,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfields @timestamp, coalesce(level, \"INFO\") as level, coalesce(msg, @message) as message, method, url, statusCode\n| filter @logStream like /queue-service/\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "Queue Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 37,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfields @timestamp, coalesce(level, \"INFO\") as level, coalesce(msg, @message) as message, method, url, statusCode\n| filter @logStream like /ml-eta-service/\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "ML ETA Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 37,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter @logStream like /gotenberg/\n| fields @timestamp, @message\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "Gotenberg PDF Service Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 44,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter @logStream like /rabbitmq/\n| fields @timestamp, @message\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "RabbitMQ Message Broker Logs"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 44,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "query": "SOURCE \"${log_group_services_arn}\" |\nfilter @logStream like /redis/\n| fields @timestamp, @message\n| sort @timestamp desc\n| limit 50",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "Redis In-Memory Database Logs"
+      }
+    }
+  ]
+}

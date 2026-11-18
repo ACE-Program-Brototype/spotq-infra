@@ -93,3 +93,14 @@ output "cloudwatch_sns_topic_arn" {
   value       = module.sns.topic_arn
 }
 
+output "cloudwatch_infra_dashboard_name" {
+  description = "Name of the host infrastructure CloudWatch dashboard"
+  value       = module.cloudwatch.infra_dashboard_name
+}
+
+output "cloudwatch_services_dashboard_name" {
+  description = "Name of the microservices CloudWatch dashboard"
+  value       = module.cloudwatch.services_dashboard_name
+}
+
+

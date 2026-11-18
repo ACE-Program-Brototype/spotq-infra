@@ -68,7 +68,7 @@ jobs:
             echo "=========================================================="
 
             # 1. Navigate to the infrastructure repository on the host
-            cd /home/ec2-user/spotq-infra
+            cd /opt/spotq/infra
 
             echo "=== [1/6] Checking and synchronizing Git branch ==="
             TARGET_BRANCH="${{ github.ref_name }}"

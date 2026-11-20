@@ -37,3 +37,23 @@ output "high_disk_alarm_arn" {
   description = "ARN of the High Disk CloudWatch alarm"
   value       = aws_cloudwatch_metric_alarm.high_disk.arn
 }
+
+output "infra_dashboard_name" {
+  description = "Name of the host infrastructure CloudWatch dashboard"
+  value       = aws_cloudwatch_dashboard.infra.dashboard_name
+}
+
+output "infra_dashboard_arn" {
+  description = "ARN of the host infrastructure CloudWatch dashboard"
+  value       = aws_cloudwatch_dashboard.infra.dashboard_arn
+}
+
+output "services_dashboard_name" {
+  description = "Name of the microservices CloudWatch dashboard"
+  value       = aws_cloudwatch_dashboard.services.dashboard_name
+}
+
+output "services_dashboard_arn" {
+  description = "ARN of the microservices CloudWatch dashboard"
+  value       = aws_cloudwatch_dashboard.services.dashboard_arn
+}

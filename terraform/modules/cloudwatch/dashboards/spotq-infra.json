@@ -1,0 +1,647 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "# SpotQ Host Infrastructure & System Performance\n*Host hardware utilization (CPU, RAM, Root Disk), EBS storage throughput & IOPS, network bandwidth, and system security audit logs.*"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/EC2",
+            "CPUUtilization",
+            "InstanceId",
+            "${instance_id}",
+            {
+              "region": "${region}"
+            }
+          ]
+        ],
+        "region": "${region}",
+        "period": 300,
+        "title": "CPU Utilization (%)",
+        "yAxis": {
+          "left": {
+            "label": "% CPU",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "liveData": true,
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "CPU Warning Threshold (80%)",
+              "value": 80,
+              "showValue": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "expression": "SELECT AVG(mem_used_percent) FROM CWAgent GROUP BY InstanceId",
+              "label": "mem_used_percent",
+              "id": "q1",
+              "region": "${region}"
+            }
+          ]
+        ],
+        "sparkline": true,
+        "view": "timeSeries",
+        "region": "${region}",
+        "stat": "Average",
+        "period": 300,
+        "stacked": false,
+        "liveData": true,
+        "yAxis": {
+          "left": {
+            "label": "% Used",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Critical Threshold (85%)",
+              "value": 85,
+              "showValue": false
+            }
+          ]
+        },
+        "title": "Memory Utilization (%)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "CWAgent",
+            "disk_used_percent",
+            "path",
+            "/",
+            "InstanceId",
+            "${instance_id}",
+            "fstype",
+            "xfs",
+            {
+              "region": "${region}"
+            }
+          ]
+        ],
+        "region": "${region}",
+        "period": 300,
+        "title": "Root Disk Storage Utilization (%)",
+        "yAxis": {
+          "left": {
+            "label": "% Used",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Critical Threshold (85%)",
+              "value": 85,
+              "showValue": false
+            }
+          ]
+        },
+        "liveData": true
+      }
+    },
+    {
+      "type": "alarm",
+      "x": 18,
+      "y": 2,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Infrastructure Alarm Status",
+        "alarms": [
+          "${alarm_cpu}",
+          "${alarm_memory}",
+          "${alarm_disk}",
+          "${alarm_status}"
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 8,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "### Network Bandwidth and Packet Traffic"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 10,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EC2",
+            "NetworkIn",
+            "InstanceId",
+            "${instance_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Network Download Traffic (Bytes)",
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 10,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EC2",
+            "NetworkOut",
+            "InstanceId",
+            "${instance_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Network Upload Traffic (Bytes)",
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 10,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EC2",
+            "NetworkPacketsIn",
+            "InstanceId",
+            "${instance_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Inbound Network Packets (Count)",
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18,
+      "y": 10,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EC2",
+            "NetworkPacketsOut",
+            "InstanceId",
+            "${instance_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Outbound Network Packets (Count)",
+        "view": "timeSeries",
+        "stacked": false
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 16,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "### Amazon EBS Storage Performance, IOPS, and Latency"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 18,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeReadBytes",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Disk Read Traffic (Bytes)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 18,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeWriteBytes",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Disk Write Traffic (Bytes)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 18,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeIdleTime",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Storage Idle Time (Seconds)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 23,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeReadOps",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Disk Read Operations (IOPS)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 23,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeWriteOps",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Disk Write Operations (IOPS)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 23,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeQueueLength",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Storage Pending Request Queue Depth"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 28,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeTotalReadTime",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Storage Read Total Time (Seconds)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 28,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/EBS",
+            "VolumeTotalWriteTime",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Average"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        },
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC",
+        "title": "Storage Write Total Time (Seconds)"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 33,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "id": "expr_latency",
+              "label": "Average Latency (ms)",
+              "expression": "IF(m_ops > 0, (SUM(m_time) / SUM(m_ops)) * 1000, 0)"
+            }
+          ],
+          [
+            "AWS/EBS",
+            "VolumeTotalReadTime",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Average",
+              "id": "m_time",
+              "visible": false
+            }
+          ],
+          [
+            "AWS/EBS",
+            "VolumeReadOps",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum",
+              "id": "m_ops",
+              "visible": false
+            }
+          ]
+        ],
+        "legend": {
+          "position": "right"
+        },
+        "title": "Average Disk Read Latency (ms per operation)",
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 33,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "id": "expr_latency",
+              "label": "Average Latency (ms)",
+              "expression": "IF(m_ops > 0, (SUM(m_time) / SUM(m_ops)) * 1000, 0)"
+            }
+          ],
+          [
+            "AWS/EBS",
+            "VolumeTotalWriteTime",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Average",
+              "id": "m_time",
+              "visible": false
+            }
+          ],
+          [
+            "AWS/EBS",
+            "VolumeWriteOps",
+            "VolumeId",
+            "${volume_id}",
+            {
+              "period": 300,
+              "stat": "Sum",
+              "id": "m_ops",
+              "visible": false
+            }
+          ]
+        ],
+        "legend": {
+          "position": "right"
+        },
+        "title": "Average Disk Write Latency (ms per operation)",
+        "region": "${region}",
+        "liveData": false,
+        "timezone": "UTC"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 38,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "### Host Operating System and Security Audit Logs (/spotq/prod/ec2)"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 40,
+      "width": 24,
+      "height": 8,
+      "properties": {
+        "query": "SOURCE \"${log_group_ec2_arn}\" |\nfields @timestamp, @logStream, @message\n| sort @timestamp desc\n| limit 100",
+        "region": "${region}",
+        "stacked": false,
+        "view": "table",
+        "title": "EC2 System and Security Logs (/var/log/messages, /var/log/secure)"
+      }
+    }
+  ]
+}

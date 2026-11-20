@@ -90,6 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "high_disk" {
   dimensions = {
     InstanceId = var.instance_id
     path       = "/"
+    fstype     = "xfs"
   }
 
   tags = var.tags

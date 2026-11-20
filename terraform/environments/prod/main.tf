@@ -53,6 +53,7 @@ module "cloudwatch" {
   ec2_log_retention_days           = var.ec2_log_retention_days
   microservices_log_retention_days = var.microservices_log_retention_days
   instance_id                      = module.ec2.instance_id
+  root_volume_id                   = module.ec2.root_volume_id
   project_name                     = var.project_name
   environment                      = var.environment
   alarm_actions                    = concat([module.sns.topic_arn], var.alarm_actions)

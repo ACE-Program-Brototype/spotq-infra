@@ -4,8 +4,9 @@ set -euo pipefail
 # Update system package repositories
 dnf update -y
 
-# Install Docker, Git, and Amazon CloudWatch Agent (curl is already provided by curl-minimal)
-dnf install -y docker git amazon-cloudwatch-agent
+# Install Docker, Git, Amazon CloudWatch Agent, and rsyslog (required for /var/log/messages on AL2023)
+dnf install -y docker git amazon-cloudwatch-agent rsyslog
+systemctl enable --now rsyslog
 
 # Install Docker Compose V2 plugin
 mkdir -p /usr/libexec/docker/cli-plugins

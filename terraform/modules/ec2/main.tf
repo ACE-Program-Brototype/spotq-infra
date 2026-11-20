@@ -52,6 +52,10 @@ resource "aws_instance" "server" {
       Name = var.instance_name
     }
   )
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 resource "aws_ec2_instance_state" "server_state" {

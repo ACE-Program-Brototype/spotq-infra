@@ -1,0 +1,5 @@
+available in Infisical
+
+cloudflare_tunnel_token = "YOUR_CLOUDFLARE_TUNNEL_TOKEN"
+infisical_token         = "YOUR_INFISICAL_SERVICE_TOKEN"
+alert_email             = "YOUR_ALERT_MAIL_ADDRESS"

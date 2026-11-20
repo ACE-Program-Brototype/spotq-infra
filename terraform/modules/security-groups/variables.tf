@@ -1,0 +1,32 @@
+variable "security_group_name" {
+  description = "Name of the security group"
+  type        = string
+}
+
+variable "description" {
+  description = "Description of the security group"
+  type        = string
+}
+
+variable "allowed_ssh_cidr_blocks" {
+  description = "List of IPv4 CIDR blocks permitted for SSH ingress"
+  type        = list(string)
+  default     = []
+}
+
+variable "app_port" {
+  description = "Port used by API Gateway application container"
+  type        = number
+  default     = 10000
+}
+
+variable "enable_public_web_ingress" {
+  description = "Enable direct public web ingress (80/443/app_port). Set to false when using Cloudflare Tunnel."
+  type        = bool
+  default     = false
+}
+
+variable "tags" {
+  description = "Resource tags"
+  type        = map(string)
+}

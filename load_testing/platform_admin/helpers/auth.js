@@ -37,7 +37,6 @@ export function loginAdmin(email = ADMIN_EMAIL, password = ADMIN_PASSWORD) {
       }
     },
   });
-  console.log(response.message,123332)
 
   if (!isSuccess) {
     console.error(`Admin dlogin failed! HTTP ${response.status}: ${response.body}`);

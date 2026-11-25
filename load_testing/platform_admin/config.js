@@ -3,7 +3,7 @@
  * Configurable via environment variables (e.g. -e BASE_URL=http://... -e TEST_PROFILE=stress)
  */
 
-export const BASE_URL = __ENV.BASE_URL || 'http://localhost:10000';
+export const BASE_URL = (__ENV.BASE_URL || 'http://localhost:10000').replace(/\/+$/, '');
 export const ADMIN_EMAIL = __ENV.ADMIN_EMAIL || 'admin@spotq.com';
 export const ADMIN_PASSWORD = __ENV.ADMIN_PASSWORD || 'Admin@12345';
 export const TEST_PROFILE = __ENV.TEST_PROFILE || 'load'; // smoke | load | stress | spike | soak

@@ -1,0 +1,447 @@
+name: spotq-platform-prod
+
+services:
+  # ─── API Gateway (Public Entrypoint via Cloudflare Tunnel) ───────────────
+  api-gateway:
+    image: ${SPOTQ_API_GATEWAY_IMAGE:-docker.io/spotq/spotq-api-gateway:latest}
+    container_name: spotq-api-gateway
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:10000:10000"
+      - "127.0.0.1:9901:9901"
+
+    networks:
+      - spotq-frontend
+      - spotq-backend
+
+    depends_on:
+      user-service:
+        condition: service_healthy
+      restaurant-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      queue-service:
+        condition: service_healthy
+      ml-eta-service:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:10000/healthz || curl -fsS http://localhost:10000/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Microservice: User Service ─────────────────────────────────────────
+  user-service:
+    image: ${SPOTQ_USER_SERVICE_IMAGE:-docker.io/spotq/spotq-user-service:latest}
+    container_name: spotq-user-service
+    restart: unless-stopped
+
+    environment:
+      INFISICAL_TOKEN: ${USER_INFISICAL_TOKEN}
+
+    networks:
+      - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3000/health || curl -fsS http://localhost:3000/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Microservice: Restaurant Service ───────────────────────────────────
+  restaurant-service:
+    image: ${SPOTQ_RESTAURANT_SERVICE_IMAGE:-docker.io/spotq/spotq-restaurant-service:latest}
+    container_name: spotq-restaurant-service
+    restart: unless-stopped
+
+    environment:
+      INFISICAL_TOKEN: ${RESTAURANT_INFISICAL_TOKEN}
+
+    networks:
+      - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3001/health || curl -fsS http://localhost:3001/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Microservice: Order Service ────────────────────────────────────────
+  order-service:
+    image: ${SPOTQ_ORDER_SERVICE_IMAGE:-docker.io/spotq/spotq-order-service:latest}
+    container_name: spotq-order-service
+    restart: unless-stopped
+
+    environment:
+      INFISICAL_TOKEN: ${ORDER_INFISICAL_TOKEN}
+
+    networks:
+      - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3002/health || curl -fsS http://localhost:3002/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Microservice: Payment Service ──────────────────────────────────────
+  payment-service:
+    image: ${SPOTQ_PAYMENT_SERVICE_IMAGE:-docker.io/spotq/spotq-payment-service:latest}
+    container_name: spotq-payment-service
+    restart: unless-stopped
+
+    environment:
+      INFISICAL_TOKEN: ${PAYMENT_INFISICAL_TOKEN}
+
+    networks:
+      - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      gotenberg:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3003/health || curl -fsS http://localhost:3003/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Microservice: Queue Service ────────────────────────────────────────
+  queue-service:
+    image: ${SPOTQ_QUEUE_SERVICE_IMAGE:-docker.io/spotq/spotq-queue-service:latest}
+    container_name: spotq-queue-service
+    restart: unless-stopped
+
+    environment:
+      INFISICAL_TOKEN: ${QUEUE_INFISICAL_TOKEN}
+
+    networks:
+      - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3004/health || curl -fsS http://localhost:3004/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Microservice: ML / ETA Service ─────────────────────────────────────
+  ml-eta-service:
+    image: ${SPOTQ_ML_ETA_SERVICE_IMAGE:-docker.io/spotq/spotq-ml-eta-service:latest}
+    container_name: spotq-ml-eta-service
+    restart: unless-stopped
+
+    environment:
+      INFISICAL_TOKEN: ${ETA_INFISICAL_TOKEN}
+
+    networks:
+      - spotq-backend
+
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8000/healthz || curl -fsS http://localhost:8000/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Datastore: Redis ───────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: spotq-redis
+    restart: unless-stopped
+
+    volumes:
+      - redis-data:/data
+
+    command: redis-server --appendonly yes
+
+    networks:
+      - spotq-backend
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── Message Broker: RabbitMQ ───────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: spotq-rabbitmq
+    hostname: spotq-rabbitmq
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:15672:15672"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+    networks:
+      - spotq-backend
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 128M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+  # ─── PDF Engine: Gotenberg ──────────────────────────────────────────────
+  gotenberg:
+    image: gotenberg/gotenberg:8.17
+    container_name: spotq-gotenberg
+    restart: unless-stopped
+    shm_size: 256m
+
+    environment:
+      - API_PORT=3008
+      - CHROMIUM_AUTO_START=true
+      - CHROMIUM_RESTART_AFTER=100
+      - LIBREOFFICE_DISABLE_ROUTES=true
+
+    networks:
+      - spotq-backend
+
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:3008/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ${AWS_REGION}
+        awslogs-group: ${AWS_LOG_GROUP}
+        awslogs-create-group: "true"
+        tag: "{{.Name}}/{{.ID}}"
+
+# ─── Networks ─────────────────────────────────────────────────────────────
+networks:
+  spotq-frontend:
+    name: spotq-frontend
+    driver: bridge
+
+  spotq-backend:
+    name: spotq-backend
+    driver: bridge
+
+# ─── Volumes ──────────────────────────────────────────────────────────────
+volumes:
+  redis-data:
+    name: spotq-redis-data
+  rabbitmq-data:
+    name: spotq-rabbitmq-data

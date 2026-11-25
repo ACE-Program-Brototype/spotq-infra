@@ -4,7 +4,7 @@
  * Discovery -> Menu -> Virtual Queue -> Cart Sync -> Checkout -> Order Placement -> Payment Verification
  */
 
-export const BASE_URL = __ENV.BASE_URL || 'http://localhost:10000';
+export const BASE_URL = (__ENV.BASE_URL || 'http://localhost:10000').replace(/\/+$/, '');
 export const CUSTOMER_EMAIL = __ENV.CUSTOMER_EMAIL || 'customer@spotq.com';
 export const CUSTOMER_PASSWORD = __ENV.CUSTOMER_PASSWORD || 'Customer@12345';
 export const CUSTOMER_TOKEN = __ENV.CUSTOMER_TOKEN || null;

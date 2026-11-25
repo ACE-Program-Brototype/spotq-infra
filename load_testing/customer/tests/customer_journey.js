@@ -4,6 +4,14 @@ import { check, group, sleep } from 'k6';
 import { ENDPOINTS, FALLBACK_RESTAURANT_ID, FALLBACK_MENU_ITEM_ID, RAZORPAY_KEY_SECRET } from '../config.js';
 import { getAuthHeaders, generateUuid } from '../helpers/auth.js';
 
+let errorLoggedCount = 0;
+function logIfFailed(endpoint, res) {
+  if (res.status >= 400 && errorLoggedCount < 10) {
+    errorLoggedCount++;
+    console.error(`[k6 failure] ${endpoint} returned HTTP ${res.status}: ${res.body ? res.body.substring(0, 300) : 'empty'}`);
+  }
+}
+
 /**
  * Simulates the must-tested, mission-critical end-to-end customer persona journey:
  * 1. Discovery: Restaurant Directory & Full Menu Catalog
@@ -31,6 +39,7 @@ export function runCustomerJourney(token, seedData = {}) {
       ...headers,
       tags: { endpoint: 'restaurants_list' },
     });
+    logIfFailed('restaurants_list', listRes);
 
     check(listRes, {
       'restaurants directory returned 200': (r) => r.status === 200,
@@ -52,6 +61,7 @@ export function runCustomerJourney(token, seedData = {}) {
       ...headers,
       tags: { endpoint: 'restaurant_details' },
     });
+    logIfFailed('restaurant_details', detailsRes);
 
     check(detailsRes, {
       'restaurant details returned 200': (r) => r.status === 200,
@@ -163,6 +173,7 @@ export function runCustomerJourney(token, seedData = {}) {
       ...headers,
       tags: { endpoint: 'cart_batch' },
     });
+    logIfFailed('cart_batch', batchRes);
 
     const isCartCreated = check(batchRes, {
       'cart batch items added successfully (200 or 201)': (r) =>

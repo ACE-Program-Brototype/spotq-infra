@@ -88,11 +88,21 @@ export function setup() {
     if (menuRes.status === 200) {
       const menuBody = JSON.parse(menuRes.body);
       const menuData = menuBody.data || {};
-      const items =
-        menuData.menuItems ||
-        menuData.items ||
-        (menuData.categories && menuData.categories[0]?.menuItems) ||
-        [];
+      let items = [];
+      if (Array.isArray(menuData.menu)) {
+        for (const cat of menuData.menu) {
+          if (Array.isArray(cat.items) && cat.items.length > 0) {
+            items.push(...cat.items);
+          }
+        }
+      }
+      if (items.length === 0) {
+        items =
+          menuData.menuItems ||
+          menuData.items ||
+          (menuData.categories && menuData.categories[0]?.menuItems) ||
+          [];
+      }
 
       if (items.length > 0 && items[0].id) {
         menuItemId = items[0].id;

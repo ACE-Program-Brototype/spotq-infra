@@ -195,7 +195,11 @@ export function runCustomerJourney(token, seedData = {}) {
 
   // ── 04. Checkout & Order Placement ─────────────────────────────────────────
   group('04_Checkout_And_Ordering', () => {
-    const targetCartId = activeCartId || generateUuid();
+    if (!activeCartId) {
+      // Cart was not established, skip checkout to avoid non-existent cart ID 404s
+      return;
+    }
+    const targetCartId = activeCartId;
 
     // 1. Inspect validated checkout calculation (pricing, taxes, packaging)
     const checkoutUrl = `${ENDPOINTS.CHECKOUT}?restaurantId=${restaurantId}&cartId=${targetCartId}`;

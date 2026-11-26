@@ -161,3 +161,7 @@ override.tf.json
 # Keep example variable files trackable if needed
 !terraform.tfvars.example
 !*.tfvars.example
+
+# Load testing artifacts
+load-test-report.html
+load-test-summary.json
